@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.georgetian.cellscan"
-    compileSdk flutter.compileSdkVersion
+    compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
     compileOptions {
