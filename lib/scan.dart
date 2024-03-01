@@ -13,9 +13,14 @@ import 'package:flutter_cell_info/models/common/cell_type.dart';
 import 'package:geolocator/geolocator.dart';
 
 
-Future<Position> getPosition() async {
+Future<Position?> getPosition() async {
   print('getting position');
-  return await Geolocator.getCurrentPosition(timeLimit: const Duration(seconds: 5));
+  try {
+    return await Geolocator.getCurrentPosition(timeLimit: const Duration(seconds: 5));
+  } on Exception catch (e) {
+    print('getCurrentPosition exception: ' + e.toString());
+  }
+  return null;
 }
 
 Future<String> getCellInfo() async {
