@@ -4,9 +4,10 @@ import 'package:cellscan/measurement.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-const MEASUREMENT_TABLE = 'measurement';
 
 class CellScanDatabase {
+  static const MEASUREMENT_TABLE = 'measurement';
+
   late Database _database;
 
   CellScanDatabase() {
@@ -15,16 +16,10 @@ class CellScanDatabase {
         join(databasesPath, 'measurements.db'),
         onCreate: (db, version) => db.execute('''
           CREATE TABLE measurement (
-            id                      INTEGER PRIMARY KEY AUTOINCREMENT,
-            longitude               REAL,
-            latitude                REAL,
-            altitude                REAL,
-            os                      TEXT,
-            cell_id                 INTEGER,
-            signal_strength         REAL,
-            time_measured           TEXT,
-            misc                    TEXT,
-            uploaded                INTEGER
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            location    TEXT,
+            cells       TEXT,
+            uploaded    INTEGER
           );
         ''')
       ).then((value) => _database = value)
@@ -41,6 +36,10 @@ class CellScanDatabase {
       batch.update(MEASUREMENT_TABLE, {'uploaded': 1}, where: 'id = ${measurement['id']}');
     }
     await batch.commit();
+  }
+
+  Future<void> insertMeasurement(Measurement measurement) async {
+    await _database.insert(MEASUREMENT_TABLE, measurement.toMap());
   }
 
 }

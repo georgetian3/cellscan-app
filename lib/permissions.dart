@@ -1,46 +1,14 @@
-import 'dart:io';
-
+import 'package:cellscan/platform.dart';
 import 'package:cellscan/scan.dart';
 import 'package:cellscan/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-const permissions = <String, List<Permission>>{
-  'all': [
-    // Permission.location,
-    // Permission.locationAlways,
-  ],
-  'android': [
-    // Permission.phone,
-    // Permission.microphone
-  ],
-  'ios': [
-  ],
-};
-
-List<Permission> getRequiredPermissions() {
-  if (!permissions.containsKey(Platform.operatingSystem)) {
-    print('Operating system not supported');
-    return [];
-  }
-  return permissions['all']! + permissions[Platform.operatingSystem]!;
-}
-
-Future<bool> allPermissionsGranted() async {
-  for (final permission in getRequiredPermissions()) {
-    if (!await permission.isGranted) {
-      print('Not granted: ${permission.toString()}');
-      return false;
-    }
-  }
-  return true;
-}
-
-Future<void> requestPermissions() async {
-  await getRequiredPermissions().request();
-}
-
-
+const permissions = [
+  Permission.phone,
+  Permission.location,
+  Permission.locationAlways,
+];
 
 class PermissionsPage extends StatefulWidget {
   const PermissionsPage({super.key});
@@ -51,12 +19,24 @@ class _PermissionPageState extends State<PermissionsPage> {
 
   Map<Permission, PermissionStatus> permissionStatus = {};
 
+  Future<void> requestPermissions() async {
+    print('requesting permissions');
+    // try {
+    //   await platform.invokeMethod<String>('permissions');
+    // } on Exception {
+    //   print('permission exception');
+    // }
+    for (final permission in permissions) {
+      final res = await permission.request();
+      print(permission.toString() + ' ' + res.toString());
+    }
+  }
+
   Future<bool> getPermissionStatus() async {
     final newPermissionStatus = <Permission, PermissionStatus>{};
-    for (final permission in getRequiredPermissions()) {
+    for (final permission in permissions) {
       newPermissionStatus[permission] = await permission.status;
     }
-    print('got permission new permission status:' + newPermissionStatus.toString());
     setState(() {permissionStatus = newPermissionStatus;});
     return true;
   }
@@ -72,14 +52,14 @@ class _PermissionPageState extends State<PermissionsPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const TextButton(onPressed: requestPermissions, child: Text('Grant permissions')),
+            TextButton(onPressed: requestPermissions, child: const Text('Grant permissions')),
             FutureBuilder(
               future: getPermissionStatus(),
               builder: (context, snapshot) {
                 if (snapshot.data != true) {
                   return emptyWidget;
                 }
-                if (permissionStatus.values.toSet() == {PermissionStatus.granted}) {
+                if (permissionStatus.values.every((status) => status == PermissionStatus.granted)) {
                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ScanPage()));
                 }
                 final ps = <Widget>[];
@@ -94,6 +74,13 @@ class _PermissionPageState extends State<PermissionsPage> {
                 return Column(children: ps);
               },
             ),
+            TextButton(onPressed: scan, child: Text('Scan')),
+            Text('Previous scan: '),
+            Text('Next scan: '),
+            Text('Previous upload: '),
+            Text('Next upload: '),
+            Text('Total measurements: '),
+            Text('Unuploaded measurements: '),
           ],
         ),
       ),

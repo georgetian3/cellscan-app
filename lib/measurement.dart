@@ -1,10 +1,16 @@
 class Measurement {
+  DateTime? timeMeasured;
   int? id;
-  double? longitude;
-  double? latitude;
-  double? altitude;
-  double? heading;
-  double? speed;
-  
+  String location = '';
+  String cells = '';
+
+  Map<String, dynamic> toMap() {
+    return {
+      'time_measured': timeMeasured?.toIso8601String(),
+      'id': id,
+      'location': location,
+      'cells': cells
+    };
+  }
 
 }

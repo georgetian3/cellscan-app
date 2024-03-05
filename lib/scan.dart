@@ -1,82 +1,34 @@
-
-// import 'dart:convert';
-
 import 'package:cellscan/measurement.dart';
+import 'package:cellscan/platform.dart';
+import 'package:cellscan/upload.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:async';
 
-import 'package:flutter_cell_info/CellResponse.dart';
-import 'package:flutter_cell_info/flutter_cell_info.dart';
-import 'package:flutter_cell_info/models/common/cell_type.dart';
 
-import 'package:geolocator/geolocator.dart';
+Future<void> scan() async {
 
+  Measurement measurement = Measurement();
+  measurement.timeMeasured = DateTime.now();
 
-Future<Position?> getPosition() async {
-  print('getting position');
   try {
-    return await Geolocator.getCurrentPosition(timeLimit: const Duration(seconds: 5));
-  } on Exception catch (e) {
-    print('getCurrentPosition exception: ' + e.toString());
+    // first get location, as this usually takes longer
+    measurement.location = await platform.invokeMethod<String>('location') ?? '';
+    measurement.cells = await platform.invokeMethod<String>('cells') ?? '';
+  } on Exception {
+    measurement.location = '';
+    measurement.cells = '';
   }
-  return null;
-}
 
-Future<String> getCellInfo() async {
-  print('logging');
-  return 'scan cell info';
-
-  // if (!await Geolocator.isLocationServiceEnabled()) {
-  //   print('Location service disabled');
+  // if (measurement.location == '') { // failed location measurement
   //   return;
   // }
 
-  // Measurement measurement = Measurement();
-
-  
-
-
-  // try {
-  //   String? platformVersion = await CellInfo.getCellInfo;
-  //   final body = json.decode(platformVersion!);
-  //   final cellsResponse = CellsResponse.fromJson(body);
-
-  //   CellType currentCellInFirstChip = cellsResponse.primaryCellList![0];
-  //   // if (currentCellInFirstChip.type == "LTE") {
-  //   //   currentDBM =
-  //   //       "LTE dbm = ${currentCellInFirstChip.lte?.signalLTE?.dbm}" ;
-  //   // } else if (currentCellInFirstChip.type == "NR") {
-  //   //   currentDBM =
-  //   //       "NR dbm = ${currentCellInFirstChip.nr?.signalNR?.dbm}" ;
-  //   // } else if (currentCellInFirstChip.type == "WCDMA") {
-  //   //   currentDBM = "WCDMA dbm = ${currentCellInFirstChip.wcdma?.signalWCDMA?.dbm}" ;
-
-  //   //   print('currentDBM = ' + currentDBM!);
-  //   // }
-
-  //   // String? simInfo = await CellInfo.getSIMInfo;
-  //   // final simJson = json.decode(simInfo!);
-  //   // print(
-  //   //     "desply name ${SIMInfoResponse.fromJson(simJson).simInfoList![0].displayName}");
-  // } on PlatformException catch (e) {
-  //   print('scan exception: $e');
+  // if (measurement.cells == '') { // failed cells measurement
+    
+  //   return;
   // }
-}
 
-
-
-
-void scan() {
-  Future.wait([
-    getPosition(),
-    getCellInfo()
-  ]).then((value) => {
-    
-    
-    print(value)
-    
-  });
+  uploadMeasurements([measurement.toMap()]);
 
 }
 
@@ -96,7 +48,7 @@ class ScanPage extends StatelessWidget {
       body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
+          children: [
             TextButton(onPressed: scan, child: Text('Scan')),
             Text('Previous scan: '),
             Text('Next scan: '),
