@@ -1,8 +1,8 @@
 class Measurement {
   DateTime? timeMeasured;
   int? id;
-  String location = '';
-  String cells = '';
+  String location = '{}';
+  String cells = '[]';
 
   Map<String, dynamic> toMap() {
     return {

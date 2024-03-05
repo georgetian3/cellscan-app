@@ -1,5 +1,5 @@
+import 'package:cellscan/permissions_page.dart';
 import 'package:flutter/material.dart';
-import 'permissions.dart';
 
 void main() {
   runApp(const CellScan());

@@ -1,11 +1,13 @@
 package com.georgetian.cellscan
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.location.LocationRequest
 import android.os.Build
+import android.os.CancellationSignal
 import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
@@ -19,6 +21,10 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import cz.mroczis.netmonster.core.INetMonster
 import cz.mroczis.netmonster.core.model.cell.ICell
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 class MainActivity: FlutterActivity() {
   private val channel = "com.georgetian.cellscan/cell_info"
@@ -42,7 +48,7 @@ class MainActivity: FlutterActivity() {
       if (cellType != null) {
         cellMaps[i]["type"] = cellType
       }
-      val connectionStatus = cells[i].connectionStatus::class.simpleName
+      val connectionStatus = cells[i].connectionStatus::class.simpleName?.lowercase()?.replace("connection", "")
       if (connectionStatus != null) {
         cellMaps[i]["connectionStatus"] = connectionStatus
       }
@@ -58,21 +64,13 @@ class MainActivity: FlutterActivity() {
     val locationMap = gson.fromJson<MutableMap<String, Any>>(gson.toJson(location), type)
     locationMap.remove("mExtras")
 
-    return gson.toJson(locationMap)
-  }
-
-  private fun requestPermissions() {
-    if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
-    ) {
-      // Permission is already granted.
-      Toast.makeText(this, "already ok", Toast.LENGTH_SHORT).show()
-    } else {
-      Toast.makeText(this, "prompting", Toast.LENGTH_SHORT).show()
-      // Permission is not granted.
-      ActivityCompat.requestPermissions(this,
-        arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 1)
+    // remove leading 'm' in keys
+    val keys = locationMap.keys.toSet()
+    for (key in keys) {
+      locationMap[key.substring(1)] = locationMap.remove(key) as Any
     }
-
+    
+    return gson.toJson(locationMap)
   }
 
   @RequiresApi(Build.VERSION_CODES.S)
@@ -85,17 +83,24 @@ class MainActivity: FlutterActivity() {
     MethodChannel(flutterEngine.dartExecutor.binaryMessenger, channel).setMethodCallHandler { call, result ->
       try {
         when (call.method) {
-          "location" -> locationManager.getCurrentLocation(
-            LocationManager.GPS_PROVIDER,
-            locationRequest,
-            null,
-            mainExecutor
-          ) { location -> result.success(postprocessLocation(location)) }
-          "cells" -> netMonster.apply { result.success(postprocessCells(getCells())) }
-          "permissions" -> {
-            requestPermissions()
-            result.success("")
+          "location" -> {
+            CoroutineScope(Dispatchers.Main).launch {
+              val cancellationSignal = CancellationSignal()
+              val timeoutJob = withTimeoutOrNull(1000L) {
+                locationManager.getCurrentLocation(
+                  LocationManager.GPS_PROVIDER,
+                  locationRequest,
+                  cancellationSignal,
+                  mainExecutor
+                ) { location -> result.success(postprocessLocation(location)) }
+              }
+              if (timeoutJob == null) {
+                cancellationSignal.cancel()
+                result.error("timeout", null, null)
+              }
+            }
           }
+          "cells" -> netMonster.apply { result.success(postprocessCells(getCells())) }
           else -> result.notImplemented()
         }
       } catch (e: Exception) {

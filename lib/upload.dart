@@ -3,6 +3,7 @@ import 'package:cellscan/database.dart';
 import 'package:http/http.dart';
 
 Future<Response> uploadMeasurements(List<Map<String, Object?>> measurements) async {
+  print('Uploading measurements');
   final response = await post(
     Uri.parse('https://cellscan.georgetian.com/measurements'),
     headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8'},
