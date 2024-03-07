@@ -1,13 +1,6 @@
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-
-enum CTheme {
-  system,
-  light,
-  dark,
-}
 
 enum Language {
   system,
@@ -18,6 +11,8 @@ enum Language {
 class Settings extends ChangeNotifier {
 
   Future<void> init() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences.setPrefix('cellscan');
     _prefs = await SharedPreferences.getInstance();
   }
 
@@ -38,9 +33,9 @@ class Settings extends ChangeNotifier {
     return index == null ? Language.system : Language.values[index];
   }
 
-  CTheme getTheme() {
+  ThemeMode getTheme() {
     final index = _prefs.getInt(_themeKey);
-    return index == null ? CTheme.system : CTheme.values[index];
+    return index == null ? ThemeMode.system : ThemeMode.values[index];
   }
 
   Future<void> setLanguage(Language language) async {
@@ -48,7 +43,7 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setTheme(CTheme theme) async {
+  Future<void> setTheme(ThemeMode theme) async {
     await _prefs.setInt(_themeKey, theme.index);
     notifyListeners();
   }

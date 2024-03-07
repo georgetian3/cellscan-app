@@ -1,3 +1,5 @@
+import 'package:cellscan/utils.dart';
+import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class Prerequisite {
@@ -14,7 +16,7 @@ class Prerequisite {
   
 }
 
-class PrerequisiteManager {
+class PrerequisiteManager extends ChangeNotifier {
 
   static final _prerequisites = <Prerequisite>[];
 
@@ -45,9 +47,6 @@ class PrerequisiteManager {
 
   Future<List<Prerequisite>> getPrerequisites() async {
     await updatePrerequisites();
-    for (final x in _prerequisites) {
-      print(x.isSatisfied);
-    }
     return _prerequisites;
   }
 
@@ -55,6 +54,7 @@ class PrerequisiteManager {
     for (final prerequisite in _prerequisites) {
       prerequisite.isSatisfied = await prerequisite.checkSatisfied();
     }
+    notifyListeners();
   }
 
   Future<void> satisfyAllPrerequisites() async {
@@ -63,6 +63,7 @@ class PrerequisiteManager {
         await prerequisite.satisfy();
       }
     }
+    updatePrerequisites();
   }
 
   Future<bool> allPrerequisitesSatisfied() async {
@@ -74,5 +75,36 @@ class PrerequisiteManager {
     return true;
   }
 
+
+}
+
+class PrerequisitesWidget extends StatelessWidget {
+
+  const PrerequisitesWidget({super.key});
+  
+  @override Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        TextButton(onPressed: () async => await PrerequisiteManager().satisfyAllPrerequisites(), child: const Text('Grant permissions')),
+        FutureBuilder(
+          future: PrerequisiteManager().getPrerequisites(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return emptyWidget;
+            }
+            final prerequisites = snapshot.data!;
+            return Column(children: [
+              for (final prerequisite in prerequisites) 
+                Row(children: [
+                  Text(prerequisite.displayName),
+                  Text(prerequisite.isSatisfied ? '1' : '0')
+                ])
+            ]);
+          },
+        ),
+      ],
+    );
+  }
 
 }
