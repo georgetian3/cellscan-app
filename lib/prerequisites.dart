@@ -25,6 +25,7 @@ class PrerequisiteManager extends ChangeNotifier {
     Permission.locationAlways,
     Permission.phone,
     Permission.ignoreBatteryOptimizations,
+    Permission.notification,
   ];
 
   PrerequisiteManager._privateConstructor() {

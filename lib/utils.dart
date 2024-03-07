@@ -9,6 +9,7 @@ void printLong(String text) {
 }
 
 Widget navigate(Function function, BuildContext context, Widget newPage) {
+  // navigate in microtask to prevent Flutter from throwing error
   Future.microtask(() => function(context, MaterialPageRoute(builder: (context) => newPage)));
   return emptyWidget;
 }

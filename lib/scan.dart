@@ -1,13 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:cellscan/measurement.dart';
 import 'package:cellscan/platform.dart';
-import 'package:cellscan/settings_page.dart';
 import 'package:cellscan/upload.dart';
-import 'package:cellscan/utils.dart';
-import 'package:flutter/material.dart';
-import 'dart:async';
-import 'package:flutter_json_view/flutter_json_view.dart';
 
 
 Future<Measurement> scan() async {

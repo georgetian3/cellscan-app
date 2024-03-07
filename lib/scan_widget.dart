@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cellscan/measurement.dart';
 import 'package:cellscan/scan.dart';
+import 'package:cellscan/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_json_view/flutter_json_view.dart';
 
@@ -35,6 +36,9 @@ class _ScanWidgetState extends State<ScanWidget> {
   }
 
   Future<void> _scan() async {
+    if (!Settings().getScanning()) {
+      return;
+    }
     Measurement measurement = await scan();
     setState(() => latestMeasurement = measurement);
   }

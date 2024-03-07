@@ -1,10 +1,25 @@
 import 'package:cellscan/main_page.dart';
 import 'package:cellscan/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_translate/flutter_translate.dart';
+
 
 void main() async {
   await Settings().init();
-  runApp(const CellScan());
+
+
+  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  final initializationSettings = await flutterLocalNotificationsPlugin.initialize(
+    const InitializationSettings(
+      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+    )
+  );
+
+  final delegate = await LocalizationDelegate.create(fallbackLocale: 'en_US', supportedLocales: ['en_US', 'zh_CN']);
+  runApp(LocalizedApp(delegate, const CellScan()));
+
 }
 
 class CellScan extends StatefulWidget {
@@ -24,12 +39,24 @@ class _CellScanState extends State<CellScan> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'CellScan',
-      theme: ThemeData(useMaterial3: true),
-      darkTheme: ThemeData(useMaterial3: true, brightness: Brightness.dark),
-      themeMode: _theme,
-      home: const MainPage()
-    );
+    var localizationDelegate = LocalizedApp.of(context).delegate;
+    return LocalizationProvider(
+      state: LocalizationProvider.of(context).state,
+      child: MaterialApp(
+        title: 'CellScan',
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          localizationDelegate
+        ],
+        supportedLocales: localizationDelegate.supportedLocales,
+        locale: localizationDelegate.currentLocale,
+        theme: ThemeData(useMaterial3: true),
+        darkTheme: ThemeData(useMaterial3: true, brightness: Brightness.dark),
+        themeMode: _theme,
+        home: const MainPage()
+        ),
+      );
+
   }
 }

@@ -26,6 +26,7 @@ class Settings extends ChangeNotifier {
 
   static const _themeKey = 'theme';
   static const _languageKey = 'language';
+  static const _scanningKey = 'scanning';
 
 
   Language getLanguage() {
@@ -38,6 +39,11 @@ class Settings extends ChangeNotifier {
     return index == null ? ThemeMode.system : ThemeMode.values[index];
   }
 
+  bool getScanning() {
+    final scanning = _prefs.getBool(_scanningKey);
+    return scanning ?? true;
+  }
+
   Future<void> setLanguage(Language language) async {
     await _prefs.setInt(_languageKey, language.index);
     notifyListeners();
@@ -45,6 +51,11 @@ class Settings extends ChangeNotifier {
 
   Future<void> setTheme(ThemeMode theme) async {
     await _prefs.setInt(_themeKey, theme.index);
+    notifyListeners();
+  }
+
+  Future<void> setScanning(bool scanning) async {
+    await _prefs.setBool(_scanningKey, scanning);
     notifyListeners();
   }
 

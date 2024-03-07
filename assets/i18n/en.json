@@ -1,0 +1,11 @@
+{
+    "settings": {
+        "settings": "Settings",
+        "language": "Language",
+        "theme": "Theme",
+        "information": "Information"
+    },
+    "select": "Select",
+    "scan": "Scan"
+
+}
