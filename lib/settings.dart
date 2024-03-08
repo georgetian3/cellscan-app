@@ -39,7 +39,7 @@ class Settings extends ChangeNotifier {
 
   static const _themeKey = 'theme';
   static const _languageKey = 'language';
-  static const _scanningKey = 'scanning';
+  static const _uploadCountKey = 'uploads';
 
 
   Language getLanguage() {
@@ -52,10 +52,15 @@ class Settings extends ChangeNotifier {
     return index == null ? ThemeMode.system : ThemeMode.values[index];
   }
 
-  bool getScanning() {
-    final scanning = _prefs.getBool(_scanningKey);
-    return scanning ?? true;
+  int getUploadCount() {
+    final uploadCount = _prefs.getInt(_uploadCountKey);
+    return uploadCount ?? 0;
   }
+
+  Future<void> incrementUploadCount(int increment) async {
+    await _prefs.setInt(_uploadCountKey, getUploadCount() + increment);
+  }
+
 
   Future<void> setLanguage(Language language) async {
     await _prefs.setInt(_languageKey, language.index);
@@ -64,11 +69,6 @@ class Settings extends ChangeNotifier {
 
   Future<void> setTheme(ThemeMode theme) async {
     await _prefs.setInt(_themeKey, theme.index);
-    notifyListeners();
-  }
-
-  Future<void> setScanning(bool scanning) async {
-    await _prefs.setBool(_scanningKey, scanning);
     notifyListeners();
   }
 

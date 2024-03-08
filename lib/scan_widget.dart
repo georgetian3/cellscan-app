@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:cellscan/database.dart';
-import 'package:cellscan/measurement.dart';
 import 'package:cellscan/scan.dart';
 import 'package:cellscan/settings.dart';
 import 'package:cellscan/utils.dart';
@@ -28,57 +25,49 @@ class ScanWidget extends StatefulWidget {
 
 class _ScanWidgetState extends State<ScanWidget> {
 
-  Measurement latestMeasurement = Measurement();
-  Timer? scanTimer;
 
   @override
   void initState() {
     super.initState();
-    scanTimer = Timer.periodic(const Duration(seconds: 60), (Timer t) async => await _scan());
-    updateScanning();
+    updateNextScan();
+    updateScanOn();
     updateUploaded();
-    Settings().addListener(updateScanning);
-    CellScanDatabase().addListener(updateUploaded);
+    Scanner().addListener(updateNextScan);
+    Scanner().addListener(updateScanOn);
+    Scanner().addListener(updateUploaded);
   }
 
-  Future<void> _scan() async {
-    if (!Settings().getScanning()) {
-      return;
-    }
-    Measurement measurement = await scan();
-    setState(() => latestMeasurement = measurement);
-  }
+  DateTime? _nextScan;
+  void updateNextScan() => setState(() => _nextScan = Scanner().nextScan);
 
-  late bool _scanning;
-  void updateScanning() => setState(() => _scanning = Settings().getScanning());
+  late bool _scanOn;
+  void updateScanOn() => setState(() => _scanOn = Scanner().scanOn);
 
-  late int _uploaded;
-  late int _unuploaded;
+  int _uploaded = 0;
+  int _unuploaded = 0;
 
-  void updateUploaded() => setState(() async {
-    _unuploaded = await CellScanDatabase().count();
-    // _uploaded = Settings().
-  });
-  
+  void updateUploaded() => CellScanDatabase().count().then((count) =>
+    setState(() {
+      _uploaded = Settings().getUploadCount();
+      _unuploaded = count;
+    })
+  );
 
   @override Widget build(BuildContext context) {
     return ListView(
       children: [
         ListTile(
           title: Text(translate('scan')),
-          leading: Icon(
-            Icons.cell_tower,
-            color: _scanning ? Theme.of(context).primaryColor : null,
-          ),
+          leading: const Icon(Icons.cell_tower),
           trailing: Switch(
-            onChanged: (scanning) async => await Settings().setScanning(scanning),
-            value: _scanning,
+            onChanged: (scanning) => scanning ? Scanner().start() : Scanner().stop(),
+            value: _scanOn,
           )
         ),
         const Divider(),
         ListTile(
           title: Text('Next scan'),
-          trailing: Text(dateToString(DateTime.now()))
+          trailing: Text(_nextScan == null ? '-' : dateToString(_nextScan!))
         ),
         ListTile(
           title: Text('Uploaded measurements'),
@@ -86,6 +75,7 @@ class _ScanWidgetState extends State<ScanWidget> {
         ),
         ListTile(
           title: Text('Unuploaded measurements'),
+          subtitle: Text('Connect to the internet to automatically upload'),
           trailing: Text(_unuploaded.toString()),
         ),
       ],

@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:cellscan/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:location/location.dart';
 
 class Prerequisite {
   final String displayName;
@@ -29,7 +30,13 @@ class PrerequisiteManager extends ChangeNotifier {
     Permission.notification,
   ];
 
+  late Timer timer;
+
   PrerequisiteManager._privateConstructor() {
+
+    // check prerequisite status every second
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) async => await updatePrerequisites());
+
     for (final permission in _requiredPermissions) {
       _prerequisites.add(
         Prerequisite(
@@ -42,10 +49,12 @@ class PrerequisiteManager extends ChangeNotifier {
     _prerequisites.add(
       Prerequisite(
         'Location service',
-        () async => Location.requestService(),
+        () async => await Permission.location.serviceStatus == ServiceStatus.enabled,
         () async => await Permission.location.serviceStatus == ServiceStatus.enabled
       )
     );
+
+
   }
 
   static final PrerequisiteManager _instance = PrerequisiteManager._privateConstructor();

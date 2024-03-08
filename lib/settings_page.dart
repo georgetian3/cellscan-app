@@ -26,8 +26,6 @@ class _SettingsPageState extends State<SettingsPage> {
   late ThemeMode _theme;
   void updateTheme() => setState(() => _theme = Settings().getTheme());
 
-
-
   @override build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(translate('settings.settings'))),
@@ -92,9 +90,14 @@ class _SettingsPageState extends State<SettingsPage> {
               )
             ),
             ListTile(
+              title: Text('Update'),
+              leading: const Icon(Icons.update),
+              onTap: () async => await launchUrl(Uri.parse('https://github.com/georgetian3/cellscan-app/releases/latest')),
+            ),
+            ListTile(
               title: Text(translate('settings.information')),
               leading: const Icon(Icons.info),
-              onTap: () async => await launchUrl(Uri.parse('https://github.com/georgetian3/cellscan-app')),
+              onTap: () async => await launchUrl(Uri.parse('https://cellscan.georgetian.com')),
             ),
           ]
         ).toList(),
