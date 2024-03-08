@@ -1,5 +1,8 @@
 import 'package:cellscan/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -25,13 +28,13 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings'),),
+      appBar: AppBar(title: Text(translate('settings.settings'))),
       body: ListView(
         children: ListTile.divideTiles(
           context: context,
           tiles: [
             ListTile(
-              title: Text('Language'),
+              title: Text(translate('settings.language')),
               leading: const Icon(Icons.language),
               subtitle: Text(_language.toString()),
               onTap: () => showDialog(
@@ -40,7 +43,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   builder: (context, setState) {
                     int language = Settings().getLanguage().index;
                     return SimpleDialog(
-                      title: Text('Select language'),
+                      title: Text(translate('settings.language')),
                       children: [
                         for (var i = 0; i < Language.values.length; i++)
                           RadioListTile<int>(
@@ -59,20 +62,20 @@ class _SettingsPageState extends State<SettingsPage> {
               )
             ),
             ListTile(
-              title: Text('Theme'),
-              leading: const Icon(Icons.language),
-              subtitle: Text(_theme.toString()),
+              title: Text(translate('settings.theme')),
+              leading: const Icon(Icons.dark_mode),
+              subtitle: Text(themeToString(_theme)),
               onTap: () => showDialog(
                 context: context,
                 builder: (BuildContext context) => StatefulBuilder(
                   builder: (context, setState) {
                     int theme = Settings().getTheme().index;
                     return SimpleDialog(
-                      title: Text('Select theme'),
+                      title: Text(translate('settings.theme')),
                       children: [
                         for (var i = 0; i < ThemeMode.values.length; i++)
                           RadioListTile<int>(
-                            title: Text(ThemeMode.values[i].toString()),
+                            title: Text(themeToString(ThemeMode.values[i])),
                             groupValue: theme,
                             value: i,
                             onChanged: (value) async {
@@ -87,8 +90,14 @@ class _SettingsPageState extends State<SettingsPage> {
               )
             ),
             ListTile(
-              title: Text('Information'),
-              leading: Icon(Icons.info),
+              title: Text('Update'),
+              leading: const Icon(Icons.update),
+              onTap: () async => await launchUrl(Uri.parse('https://github.com/georgetian3/cellscan-app/releases/latest')),
+            ),
+            ListTile(
+              title: Text(translate('settings.information')),
+              leading: const Icon(Icons.info),
+              onTap: () async => await launchUrl(Uri.parse('https://cellscan.georgetian.com')),
             ),
           ]
         ).toList(),

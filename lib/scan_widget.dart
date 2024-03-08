@@ -1,10 +1,10 @@
-import 'dart:async';
-
-import 'package:cellscan/measurement.dart';
+import 'package:cellscan/database.dart';
 import 'package:cellscan/scan.dart';
+import 'package:cellscan/settings.dart';
+import 'package:cellscan/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_json_view/flutter_json_view.dart';
-
+import 'package:flutter_translate/flutter_translate.dart';
 
 const jsonViewTheme = JsonViewTheme(
   keyStyle: TextStyle(color: Color.fromARGB(255, 156, 220, 254)),
@@ -25,30 +25,60 @@ class ScanWidget extends StatefulWidget {
 
 class _ScanWidgetState extends State<ScanWidget> {
 
-  Measurement latestMeasurement = Measurement();
-  Timer? scanTimer;
 
   @override
   void initState() {
     super.initState();
-    scanTimer = Timer.periodic(const Duration(seconds: 60), (Timer t) async => await _scan());
+    updateNextScan();
+    updateScanOn();
+    updateUploaded();
+    Scanner().addListener(updateNextScan);
+    Scanner().addListener(updateScanOn);
+    Scanner().addListener(updateUploaded);
   }
 
-  Future<void> _scan() async {
-    Measurement measurement = await scan();
-    setState(() => latestMeasurement = measurement);
-  }
-  
+  DateTime? _nextScan;
+  void updateNextScan() => setState(() => _nextScan = Scanner().nextScan);
+
+  late bool _scanOn;
+  void updateScanOn() => setState(() => _scanOn = Scanner().scanOn);
+
+  int _uploaded = 0;
+  int _unuploaded = 0;
+
+  void updateUploaded() => CellScanDatabase().count().then((count) =>
+    setState(() {
+      _uploaded = Settings().getUploadCount();
+      _unuploaded = count;
+    })
+  );
 
   @override Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // TextButton(onPressed: _scan, child: Text('Scan')),
-          JsonView.map(measurementToJson(latestMeasurement), theme: jsonViewTheme)
-        ],
-      ),
+    return ListView(
+      children: [
+        ListTile(
+          title: Text(translate('scan')),
+          leading: const Icon(Icons.cell_tower),
+          trailing: Switch(
+            onChanged: (scanning) => scanning ? Scanner().start() : Scanner().stop(),
+            value: _scanOn,
+          )
+        ),
+        const Divider(),
+        ListTile(
+          title: Text('Next scan'),
+          trailing: Text(_nextScan == null ? '-' : dateToString(_nextScan!))
+        ),
+        ListTile(
+          title: Text('Uploaded measurements'),
+          trailing: Text(_uploaded.toString()),
+        ),
+        ListTile(
+          title: Text('Unuploaded measurements'),
+          subtitle: Text('Connect to the internet to automatically upload'),
+          trailing: Text(_unuploaded.toString()),
+        ),
+      ],
     );
   }
 

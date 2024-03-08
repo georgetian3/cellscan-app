@@ -1,39 +1,46 @@
 import 'dart:async';
 
 import 'package:cellscan/measurement.dart';
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 
-class CellScanDatabase {
+class CellScanDatabase extends ChangeNotifier {
+
   static const MEASUREMENT_TABLE = 'measurement';
 
   late Database _database;
 
-  CellScanDatabase() {
-    getDatabasesPath().then((databasesPath) =>
-      openDatabase(
-        join(databasesPath, 'measurements.db'),
-        onCreate: (db, version) => db.execute('''
-          CREATE TABLE measurement (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
-            location    TEXT,
-            cells       TEXT,
-            uploaded    INTEGER
-          );
-        ''')
-      ).then((value) => _database = value)
+  Future<void> init() async {
+    _database = await openDatabase(
+      join(await getDatabasesPath(), 'measurements.db'),
+      version: 1,
+      onUpgrade: (db, oldVersion, newVersion) => db.execute('''
+        CREATE TABLE measurement (
+          id            INTEGER PRIMARY KEY AUTOINCREMENT,
+          time_measured TEXT,
+          location      TEXT,
+          cells         TEXT
+        );
+      ''')
     );
   }
 
-  Future<List<Map<String, Object?>>> getNotUploadedMeasurements() async {
-    return _database.rawQuery('SELECT * FROM $MEASUREMENT_TABLE WHERE uploaded = 0');
+  CellScanDatabase._privateConstructor();
+  static final CellScanDatabase _instance = CellScanDatabase._privateConstructor();
+  factory CellScanDatabase() => _instance;
+
+  
+
+  Future<List<Map<String, Object?>>> getMeasurements() async {
+    return _database.rawQuery('SELECT * FROM $MEASUREMENT_TABLE');
   }
 
-  Future<void> setUploaded(List<Map<String, Object?>> measurements) async {
+  Future<void> deleteMeasurements(List<Map<String, Object?>> measurements) async {
     final batch = _database.batch();
     for (final measurement in measurements) {
-      batch.update(MEASUREMENT_TABLE, {'uploaded': 1}, where: 'id = ${measurement['id']}');
+      batch.delete(MEASUREMENT_TABLE, where: 'id = ${measurement['id']}');
     }
     await batch.commit();
   }
@@ -42,6 +49,8 @@ class CellScanDatabase {
     await _database.insert(MEASUREMENT_TABLE, measurement.toMap());
   }
 
-}
+  Future<int> count() async {
+    return Sqflite.firstIntValue(await _database.rawQuery('SELECT COUNT(id) FROM $MEASUREMENT_TABLE')) ?? 0;
+  }
 
-CellScanDatabase cellScanDatabase = CellScanDatabase();
+}

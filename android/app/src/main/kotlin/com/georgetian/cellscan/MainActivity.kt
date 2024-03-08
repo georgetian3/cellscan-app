@@ -62,14 +62,14 @@ class MainActivity: FlutterActivity() {
     }
     val type = object : TypeToken<MutableMap<String, Any>>() {}.type
     val locationMap = gson.fromJson<MutableMap<String, Any>>(gson.toJson(location), type)
-    locationMap.remove("mExtras")
+    // locationMap.remove("mExtras")
 
     // remove leading 'm' in keys
     val keys = locationMap.keys.toSet()
     for (key in keys) {
       locationMap[key.substring(1)] = locationMap.remove(key) as Any
     }
-    
+
     return gson.toJson(locationMap)
   }
 

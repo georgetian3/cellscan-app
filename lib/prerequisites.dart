@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cellscan/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -25,9 +27,16 @@ class PrerequisiteManager extends ChangeNotifier {
     Permission.locationAlways,
     Permission.phone,
     Permission.ignoreBatteryOptimizations,
+    Permission.notification,
   ];
 
+  late Timer timer;
+
   PrerequisiteManager._privateConstructor() {
+
+    // check prerequisite status every second
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) async => await updatePrerequisites());
+
     for (final permission in _requiredPermissions) {
       _prerequisites.add(
         Prerequisite(
@@ -37,6 +46,15 @@ class PrerequisiteManager extends ChangeNotifier {
         )
       );
     }
+    _prerequisites.add(
+      Prerequisite(
+        'Location service',
+        () async => await Permission.location.serviceStatus == ServiceStatus.enabled,
+        () async => await Permission.location.serviceStatus == ServiceStatus.enabled
+      )
+    );
+
+
   }
 
   static final PrerequisiteManager _instance = PrerequisiteManager._privateConstructor();
@@ -87,22 +105,26 @@ class PrerequisitesWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         TextButton(onPressed: () async => await PrerequisiteManager().satisfyAllPrerequisites(), child: const Text('Grant permissions')),
-        FutureBuilder(
-          future: PrerequisiteManager().getPrerequisites(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return emptyWidget;
-            }
-            final prerequisites = snapshot.data!;
-            return Column(children: [
-              for (final prerequisite in prerequisites) 
-                Row(children: [
-                  Text(prerequisite.displayName),
-                  Text(prerequisite.isSatisfied ? '1' : '0')
-                ])
-            ]);
-          },
-        ),
+        Expanded(
+          child: FutureBuilder(
+            future: PrerequisiteManager().getPrerequisites(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return emptyWidget;
+              }
+              final prerequisites = snapshot.data!;
+              return ListView(
+                children: [
+                  for (final prerequisite in prerequisites) 
+                    ListTile(
+                      title: Text(prerequisite.displayName),
+                      trailing: Icon(prerequisite.isSatisfied ? Icons.done : Icons.close),
+                    )
+                ]
+              );
+            },
+          ),
+        )
       ],
     );
   }

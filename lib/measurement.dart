@@ -6,7 +6,7 @@ class Measurement {
 
   Map<String, dynamic> toMap() {
     return {
-      'time_measured': timeMeasured?.toIso8601String(),
+      'time_measured': timeMeasured?.toUtc().toIso8601String(),
       'id': id,
       'location': location,
       'cells': cells

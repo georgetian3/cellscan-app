@@ -1,23 +1,36 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum Language {
-  system,
-  english,
-  chinese,
+  system, english, chinese;
+
+  @override String toString() {
+    switch (this) {
+      case Language.system: return translate('settings.system');
+      case Language.english: return translate('English');
+      case Language.chinese: return translate('简体中文');
+    }
+  }
+}
+
+String themeToString(ThemeMode theme) {
+  switch (theme) {
+    case ThemeMode.system: return translate('settings.system');
+    case ThemeMode.light: return translate('settings.light');
+    case ThemeMode.dark: return translate('settings.dark');
+  }
 }
 
 class Settings extends ChangeNotifier {
 
   Future<void> init() async {
-    WidgetsFlutterBinding.ensureInitialized();
     SharedPreferences.setPrefix('cellscan');
     _prefs = await SharedPreferences.getInstance();
   }
 
   Settings._privateConstructor();
-
   static final Settings _instance = Settings._privateConstructor();
   factory Settings() => _instance;
 
@@ -26,6 +39,7 @@ class Settings extends ChangeNotifier {
 
   static const _themeKey = 'theme';
   static const _languageKey = 'language';
+  static const _uploadCountKey = 'uploads';
 
 
   Language getLanguage() {
@@ -37,6 +51,16 @@ class Settings extends ChangeNotifier {
     final index = _prefs.getInt(_themeKey);
     return index == null ? ThemeMode.system : ThemeMode.values[index];
   }
+
+  int getUploadCount() {
+    final uploadCount = _prefs.getInt(_uploadCountKey);
+    return uploadCount ?? 0;
+  }
+
+  Future<void> incrementUploadCount(int increment) async {
+    await _prefs.setInt(_uploadCountKey, getUploadCount() + increment);
+  }
+
 
   Future<void> setLanguage(Language language) async {
     await _prefs.setInt(_languageKey, language.index);

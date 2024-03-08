@@ -1,0 +1,14 @@
+{
+    "settings": {
+        "settings": "Settings",
+        "language": "Language",
+        "system": "System",
+        "theme": "Theme",
+        "light": "Light",
+        "dark": "Dark",
+        "information": "Information"
+    },
+    "select": "Select",
+    "scan": "Scan"
+
+}
