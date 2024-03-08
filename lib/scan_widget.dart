@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:cellscan/database.dart';
 import 'package:cellscan/measurement.dart';
 import 'package:cellscan/scan.dart';
 import 'package:cellscan/settings.dart';
+import 'package:cellscan/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_json_view/flutter_json_view.dart';
-
+import 'package:flutter_translate/flutter_translate.dart';
 
 const jsonViewTheme = JsonViewTheme(
   keyStyle: TextStyle(color: Color.fromARGB(255, 156, 220, 254)),
@@ -33,6 +35,10 @@ class _ScanWidgetState extends State<ScanWidget> {
   void initState() {
     super.initState();
     scanTimer = Timer.periodic(const Duration(seconds: 60), (Timer t) async => await _scan());
+    updateScanning();
+    updateUploaded();
+    Settings().addListener(updateScanning);
+    CellScanDatabase().addListener(updateUploaded);
   }
 
   Future<void> _scan() async {
@@ -42,17 +48,47 @@ class _ScanWidgetState extends State<ScanWidget> {
     Measurement measurement = await scan();
     setState(() => latestMeasurement = measurement);
   }
+
+  late bool _scanning;
+  void updateScanning() => setState(() => _scanning = Settings().getScanning());
+
+  late int _uploaded;
+  late int _unuploaded;
+
+  void updateUploaded() => setState(() async {
+    _unuploaded = await CellScanDatabase().count();
+    // _uploaded = Settings().
+  });
   
 
   @override Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // TextButton(onPressed: _scan, child: Text('Scan')),
-          JsonView.map(measurementToJson(latestMeasurement), theme: jsonViewTheme)
-        ],
-      ),
+    return ListView(
+      children: [
+        ListTile(
+          title: Text(translate('scan')),
+          leading: Icon(
+            Icons.cell_tower,
+            color: _scanning ? Theme.of(context).primaryColor : null,
+          ),
+          trailing: Switch(
+            onChanged: (scanning) async => await Settings().setScanning(scanning),
+            value: _scanning,
+          )
+        ),
+        const Divider(),
+        ListTile(
+          title: Text('Next scan'),
+          trailing: Text(dateToString(DateTime.now()))
+        ),
+        ListTile(
+          title: Text('Uploaded measurements'),
+          trailing: Text(_uploaded.toString()),
+        ),
+        ListTile(
+          title: Text('Unuploaded measurements'),
+          trailing: Text(_unuploaded.toString()),
+        ),
+      ],
     );
   }
 

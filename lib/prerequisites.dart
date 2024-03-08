@@ -1,6 +1,7 @@
 import 'package:cellscan/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:location/location.dart';
 
 class Prerequisite {
   final String displayName;
@@ -38,6 +39,13 @@ class PrerequisiteManager extends ChangeNotifier {
         )
       );
     }
+    _prerequisites.add(
+      Prerequisite(
+        'Location service',
+        () async => Location.requestService(),
+        () async => await Permission.location.serviceStatus == ServiceStatus.enabled
+      )
+    );
   }
 
   static final PrerequisiteManager _instance = PrerequisiteManager._privateConstructor();
@@ -88,22 +96,26 @@ class PrerequisitesWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         TextButton(onPressed: () async => await PrerequisiteManager().satisfyAllPrerequisites(), child: const Text('Grant permissions')),
-        FutureBuilder(
-          future: PrerequisiteManager().getPrerequisites(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return emptyWidget;
-            }
-            final prerequisites = snapshot.data!;
-            return Column(children: [
-              for (final prerequisite in prerequisites) 
-                Row(children: [
-                  Text(prerequisite.displayName),
-                  Text(prerequisite.isSatisfied ? '1' : '0')
-                ])
-            ]);
-          },
-        ),
+        Expanded(
+          child: FutureBuilder(
+            future: PrerequisiteManager().getPrerequisites(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return emptyWidget;
+              }
+              final prerequisites = snapshot.data!;
+              return ListView(
+                children: [
+                  for (final prerequisite in prerequisites) 
+                    ListTile(
+                      title: Text(prerequisite.displayName),
+                      trailing: Icon(prerequisite.isSatisfied ? Icons.done : Icons.close),
+                    )
+                ]
+              );
+            },
+          ),
+        )
       ],
     );
   }

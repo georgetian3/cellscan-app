@@ -13,3 +13,5 @@ Widget navigate(Function function, BuildContext context, Widget newPage) {
   Future.microtask(() => function(context, MaterialPageRoute(builder: (context) => newPage)));
   return emptyWidget;
 }
+
+String dateToString(DateTime dateTime) => dateTime.toString().substring(0, 19);

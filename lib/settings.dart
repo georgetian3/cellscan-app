@@ -1,23 +1,36 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum Language {
-  system,
-  english,
-  chinese,
+  system, english, chinese;
+
+  @override String toString() {
+    switch (this) {
+      case Language.system: return translate('settings.system');
+      case Language.english: return translate('English');
+      case Language.chinese: return translate('简体中文');
+    }
+  }
+}
+
+String themeToString(ThemeMode theme) {
+  switch (theme) {
+    case ThemeMode.system: return translate('settings.system');
+    case ThemeMode.light: return translate('settings.light');
+    case ThemeMode.dark: return translate('settings.dark');
+  }
 }
 
 class Settings extends ChangeNotifier {
 
   Future<void> init() async {
-    WidgetsFlutterBinding.ensureInitialized();
     SharedPreferences.setPrefix('cellscan');
     _prefs = await SharedPreferences.getInstance();
   }
 
   Settings._privateConstructor();
-
   static final Settings _instance = Settings._privateConstructor();
   factory Settings() => _instance;
 
