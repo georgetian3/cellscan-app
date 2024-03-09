@@ -2,10 +2,8 @@ name: publish-android-apk
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 jobs:
-  build-apk:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -13,4 +11,6 @@ jobs:
         with:
           flutter-version: 3.19.2
           channel: stable
-      - run: flutter --version
+          cache: true
+      - run: flutter pub get
+      - run: flutter build apk
