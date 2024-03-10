@@ -34,7 +34,7 @@ class CellScanDatabase extends ChangeNotifier {
   
 
   Future<List<Map<String, Object?>>> getMeasurements() async {
-    return _database.rawQuery('SELECT * FROM $MEASUREMENT_TABLE');
+    return await _database.query(MEASUREMENT_TABLE);
   }
 
   Future<void> deleteMeasurements(List<Map<String, Object?>> measurements) async {
