@@ -2,7 +2,7 @@ name: cellscan
 description: "Collect user and cell tower information for the CellScan project."
 publish_to: 'none'
 
-version: 0.2.0
+version: 0.3.0
 
 environment:
   sdk: '>=3.2.6 <4.0.0'
