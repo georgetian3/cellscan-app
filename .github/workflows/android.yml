@@ -25,6 +25,7 @@ jobs:
       - name: Release
         uses: ncipollo/release-action@v1
         with:
+          name: CellScan ${{ env.CELLSCAN_VERSION }}
           tag: ${{ env.CELLSCAN_VERSION }}
           commit: main
-          artifacts: build/app/outputs/apk/release/cellscan-v${{ env.CELLSCAN_VERSION }}.apk
+          artifacts: build/app/outputs/apk/release/cellscan-${{ env.CELLSCAN_VERSION }}.apk
