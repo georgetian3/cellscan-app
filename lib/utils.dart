@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+
 
 const emptyWidget = SizedBox(width: 0, height: 0);
 
@@ -15,3 +15,35 @@ Widget navigate(Function function, BuildContext context, Widget newPage) {
 }
 
 String dateToString(DateTime dateTime) => dateTime.toString().substring(0, 19);
+
+
+Future<T> showLoading <T> (BuildContext context, Future<T> future, {String? text}) async {
+  var children = <Widget>[const CircularProgressIndicator()];
+  if (text != null) {
+    children.add(const SizedBox(height: 16));
+    children.add(Text(
+      text,
+    ));
+  }
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (context) {
+      return Dialog(          
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: children,
+          ),
+        ),
+      );
+    }
+  );
+  T rv = await future;
+  if (context.mounted) {
+    Navigator.pop(context);
+  }
+  return rv;
+}

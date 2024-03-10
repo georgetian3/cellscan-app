@@ -1,28 +1,26 @@
 import 'dart:io';
-
 import 'package:cellscan/database.dart';
 import 'package:cellscan/main_page.dart';
+import 'package:cellscan/notifications.dart';
 import 'package:cellscan/settings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 
-
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
+
   await CellScanDatabase().init();
   await Settings().init();
-
-  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  final initializationSettings = await flutterLocalNotificationsPlugin.initialize(
-    const InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+  await Notifications().init();
+  
+  runApp(
+    LocalizedApp(
+      await LocalizationDelegate.create(fallbackLocale: 'en', supportedLocales: ['en', 'zh']),
+      const CellScan()
     )
   );
-
-  final delegate = await LocalizationDelegate.create(fallbackLocale: 'en', supportedLocales: ['en', 'zh']);
-  runApp(LocalizedApp(delegate, const CellScan()));
 
 }
 

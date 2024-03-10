@@ -69,10 +69,18 @@ class PrerequisiteManager extends ChangeNotifier {
   }
 
   Future<void> updatePrerequisites() async {
+    print('updating prereqs');
+    bool changed = false;
     for (final prerequisite in _prerequisites) {
-      prerequisite.isSatisfied = await prerequisite.checkSatisfied();
+      bool newValue = await prerequisite.checkSatisfied();
+      if (prerequisite.isSatisfied != newValue) {
+        prerequisite.isSatisfied = newValue;
+        changed = true;
+      }
     }
-    notifyListeners();
+    if (changed) {
+      notifyListeners();
+    }
   }
 
   Future<void> satisfyAllPrerequisites() async {

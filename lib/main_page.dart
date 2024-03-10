@@ -19,7 +19,6 @@ class _MainPageState extends State<MainPage> {
     PrerequisiteManager().addListener(updatePrerequisites);
   }
 
-
   bool allPrerequisitesSatisfied = false;
   Future<void> updatePrerequisites() async {
     bool x = await PrerequisiteManager().allPrerequisitesSatisfied();

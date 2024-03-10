@@ -9,6 +9,7 @@
         "information": "Information"
     },
     "select": "Select",
-    "scan": "Scan"
-
+    "scan": "Scan",
+    "scanningOn": "Scanning on",
+    "scanningOff": "Scanning off"
 }
