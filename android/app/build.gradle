@@ -62,9 +62,9 @@ android {
                     def appName = "cellscan"
                     def newName
                     if (buildType == 'debug'){
-                        newName = "${appName}-${defaultConfig.versionName}-debug.apk"
+                        newName = "${appName}-v${defaultConfig.versionName}-debug.apk"
                     } else {
-                        newName = "${appName}-${defaultConfig.versionName}.apk"
+                        newName = "${appName}-v${defaultConfig.versionName}.apk"
                     }
                     outputFileName = newName
                 }
