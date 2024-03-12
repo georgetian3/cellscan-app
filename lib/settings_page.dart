@@ -1,7 +1,5 @@
 import 'package:cellscan/locale.dart';
 import 'package:cellscan/settings.dart';
-import 'package:cellscan/update.dart';
-import 'package:cellscan/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
