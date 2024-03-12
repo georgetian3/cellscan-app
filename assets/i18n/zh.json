@@ -9,5 +9,31 @@
         "information": "信息"
     },
     "select": "选择",
-    "scan": "扫描"
+    "scan": "扫描",
+    "nextMeasurement": "下一次测量",
+    "uploadedMeasurements": "已上传测量",
+    "unuploadedMeasurements": "未上传测量",
+    "connect": "连网后自动上传",
+    "prerequisites": {
+        "location": "定位权限",
+        "locationAlways": "后台定位权限",
+        "phone": "电话权限",
+        "notifications": "通知权限",
+        "battery": "后台运行权限",
+        "locationService": "定位服务",
+        "explanation": "为了采集数据，请授权/开启以下的权限/服务",
+        "grant": "授权 / 开启"
+    },
+    "interval": "测量间隔",
+    "gpsSignal": "GPS 信号",
+    "signalHint": "GPS 信号需要直接看到天空",
+    "notifications": {
+        "grant": "请授权/开启所有权限/服务",
+        "scanningOn": "扫描已开启",
+        "scanningOff": "扫描已关闭",
+        "noGPS": "没有 GPS 信号"
+    },
+    "updateAvailable": "发现新版本",
+    "cancel": "取消",
+    "update": "更新"
 }

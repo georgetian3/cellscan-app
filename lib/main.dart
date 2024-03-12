@@ -1,28 +1,27 @@
-import 'dart:io';
-
 import 'package:cellscan/database.dart';
+import 'package:cellscan/locale.dart';
 import 'package:cellscan/main_page.dart';
+import 'package:cellscan/notifications.dart';
 import 'package:cellscan/settings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-
+import 'package:dynamic_color/dynamic_color.dart';
 
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
+
   await CellScanDatabase().init();
   await Settings().init();
-
-  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  final initializationSettings = await flutterLocalNotificationsPlugin.initialize(
-    const InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+  await Notifications().init();
+  
+  runApp(
+    LocalizedApp(
+      await LocalizationDelegate.create(fallbackLocale: 'en', supportedLocales: ['en', 'zh']),
+      const CellScan()
     )
   );
-
-  final delegate = await LocalizationDelegate.create(fallbackLocale: 'en', supportedLocales: ['en', 'zh']);
-  runApp(LocalizedApp(delegate, const CellScan()));
 
 }
 
@@ -34,39 +33,48 @@ class CellScan extends StatefulWidget {
 class _CellScanState extends State<CellScan> {
   @override void initState() {
     super.initState();
-    updateTheme();
-    updateLanguage();
-    Settings().addListener(updateTheme);
-    Settings().addListener(updateLanguage);
+    Settings().addListener(() => setState(() => {}));
   }
 
-  late ThemeMode _theme;
-  void updateTheme() => setState(() => _theme = Settings().getTheme());
-  late Language _language;
-  void updateLanguage() => setState(() => _language = Settings().getLanguage());
+  static const _brandBlue = Color.fromARGB(255, 135, 206, 250);
 
   @override
   Widget build(BuildContext context) {
-    var localizationDelegate = LocalizedApp.of(context).delegate;
+    localizationDelegate = LocalizedApp.of(context).delegate;
     return LocalizationProvider(
       state: LocalizationProvider.of(context).state,
-      child: MaterialApp(
-        title: 'CellScan',
-        localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          localizationDelegate
-        ],
-        supportedLocales: localizationDelegate.supportedLocales,
-        locale: _language == Language.system ? Locale(Platform.localeName)
-              : _language == Language.english ? const Locale('en')
-              : _language == Language.chinese ? const Locale('zh')
-              : localizationDelegate.fallbackLocale,
-        theme: ThemeData(useMaterial3: true),
-        darkTheme: ThemeData(useMaterial3: true, brightness: Brightness.dark),
-        themeMode: _theme,
-        home: const MainPage()
-      )
+      child: DynamicColorBuilder(builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+        ColorScheme lightColorScheme;
+        ColorScheme darkColorScheme;
+        if (lightDynamic != null && darkDynamic != null) {
+          lightColorScheme = lightDynamic.harmonized();
+          lightColorScheme = lightColorScheme.copyWith(secondary: _brandBlue);
+          darkColorScheme = darkDynamic.harmonized();
+          darkColorScheme = darkColorScheme.copyWith(secondary: _brandBlue);
+        } else {
+          lightColorScheme = ColorScheme.fromSeed(seedColor: _brandBlue);
+          darkColorScheme = ColorScheme.fromSeed(seedColor: _brandBlue, brightness: Brightness.dark);
+        }
+      
+        return MaterialApp(
+          title: 'CellScan',
+          localizationsDelegates: [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            localizationDelegate
+          ],
+          supportedLocales: localizationDelegate.supportedLocales,
+          locale: languageToLocale(Settings().getLanguage()),
+          theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
+          darkTheme: ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
+          
+          //   scaffoldBackgroundColor: Colors.black,
+          //   appBarTheme: const AppBarTheme(color: Colors.black),
+          // ),
+          themeMode: Settings().getTheme(),
+          home: const MainPage()
+        );
+      })
     );
   }
 }

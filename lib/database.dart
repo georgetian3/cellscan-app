@@ -31,8 +31,6 @@ class CellScanDatabase extends ChangeNotifier {
   static final CellScanDatabase _instance = CellScanDatabase._privateConstructor();
   factory CellScanDatabase() => _instance;
 
-  
-
   Future<List<Map<String, Object?>>> getMeasurements() async {
     return await _database.query(MEASUREMENT_TABLE);
   }
@@ -43,14 +41,19 @@ class CellScanDatabase extends ChangeNotifier {
       batch.delete(MEASUREMENT_TABLE, where: 'id = ${measurement['id']}');
     }
     await batch.commit();
+    await _updateCount();
   }
 
   Future<void> insertMeasurement(Measurement measurement) async {
     await _database.insert(MEASUREMENT_TABLE, measurement.toMap());
+    await _updateCount();
   }
 
-  Future<int> count() async {
-    return Sqflite.firstIntValue(await _database.rawQuery('SELECT COUNT(id) FROM $MEASUREMENT_TABLE')) ?? 0;
+  int _count = 0;
+  int get count => _count;
+
+  Future<void> _updateCount() async {
+    _count = Sqflite.firstIntValue(await _database.rawQuery('SELECT COUNT(id) FROM $MEASUREMENT_TABLE')) ?? 0;
   }
 
 }

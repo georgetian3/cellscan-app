@@ -69,7 +69,6 @@ class MainActivity: FlutterActivity() {
     for (key in keys) {
       locationMap[key.substring(1)] = locationMap.remove(key) as Any
     }
-
     return gson.toJson(locationMap)
   }
 
@@ -81,32 +80,22 @@ class MainActivity: FlutterActivity() {
     locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
 
     MethodChannel(flutterEngine.dartExecutor.binaryMessenger, channel).setMethodCallHandler { call, result ->
-      try {
-        when (call.method) {
-          "location" -> {
-            CoroutineScope(Dispatchers.Main).launch {
-              val cancellationSignal = CancellationSignal()
-              val timeoutJob = withTimeoutOrNull(1000L) {
-                locationManager.getCurrentLocation(
-                  LocationManager.GPS_PROVIDER,
-                  locationRequest,
-                  cancellationSignal,
-                  mainExecutor
-                ) { location -> result.success(postprocessLocation(location)) }
-              }
-              if (timeoutJob == null) {
-                cancellationSignal.cancel()
-                result.error("timeout", null, null)
-              }
-            }
+      when (call.method) {
+        "location" -> {
+          try {
+            locationManager.getCurrentLocation(
+              LocationManager.GPS_PROVIDER,
+              locationRequest,
+              null,
+              mainExecutor
+            ) { location -> result.success(postprocessLocation(location)) }
+          } catch (e: Exception) {
+            result.error(e.toString(), null, null)
           }
-          "cells" -> netMonster.apply { result.success(postprocessCells(getCells())) }
-          else -> result.notImplemented()
         }
-      } catch (e: Exception) {
-        result.error(e.toString(), null, null)
+        "cells" -> netMonster.apply { result.success(postprocessCells(getCells())) }
+        else -> result.notImplemented()
       }
     }
-
   }
 }

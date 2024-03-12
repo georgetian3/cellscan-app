@@ -1,4 +1,7 @@
+import 'package:cellscan/locale.dart';
 import 'package:cellscan/settings.dart';
+import 'package:cellscan/update.dart';
+import 'package:cellscan/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -53,6 +56,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             onChanged: (value) async {
                               await Settings().setLanguage(Language.values[value ?? 0]);
                               setState(() => language = Settings().getLanguage().index);
+                              localizationDelegate.changeLocale(languageToLocale(Settings().getLanguage()));
                             }
                           )
                       ]
@@ -89,11 +93,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 )
               )
             ),
-            ListTile(
-              title: Text('Update'),
-              leading: const Icon(Icons.update),
-              onTap: () async => await launchUrl(Uri.parse('https://github.com/georgetian3/cellscan-app/releases/latest')),
-            ),
+            // ListTile(
+            //   title: Text('Update'),
+            //   leading: const Icon(Icons.update),
+            //   onTap: () async {
+            //     if (await showLoading(context, hasUpdate(), text: 'Updating')) {
+            //       await launchUrl(Uri.parse('https://github.com/georgetian3/cellscan-app/releases/latest'));
+            //     } else {
+            //       showDialog(context: context, builder: (context) => SimpleDialog(title: Text('Latest version installed')));
+            //     }
+            //   }
+            // ),
             ListTile(
               title: Text(translate('settings.information')),
               leading: const Icon(Icons.info),

@@ -9,6 +9,32 @@
         "information": "Information"
     },
     "select": "Select",
-    "scan": "Scan"
-
+    "scan": "Scan",
+    
+    "nextMeasurement": "Next measurement",
+    "uploadedMeasurements": "Uploaded measurements",
+    "unuploadedMeasurements": "Unuploaded measurements",
+    "connect": "Connect to the internet to automatically upload",
+    "prerequisites": {
+        "location": "Location",
+        "locationAlways": "Background location",
+        "phone": "Phone",
+        "notifications": "Notifications",
+        "battery": "Run in background",
+        "locationService": "Location service",
+        "explanation": "For proper data collection, please grant/enable the following permissions/services",
+        "grant": "Grant / Enable"
+    },
+    "interval": "Measurement interval",
+    "gpsSignal": "GPS signal",
+    "signalHint": "GPS signal requires a clear view of the sky",
+    "notifications": {
+        "grant": "Please grant / enable all permissions / services",
+        "scanningOn": "Scanning on",
+        "scanningOff": "Scanning off",
+        "noGPS": "No GPS signal"
+    },
+    "updateAvailable": "New version available",
+    "cancel": "Cancel",
+    "update": "Update"
 }
