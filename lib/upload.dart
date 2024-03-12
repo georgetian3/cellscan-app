@@ -4,15 +4,19 @@ import 'package:cellscan/settings.dart';
 import 'package:http/http.dart';
 
 Future<Response> uploadMeasurements(List<Map<String, Object?>> measurements) async {
-  final response = await post(
+  final possiblyNonStringFields = ['location', 'cells'];
+  for (final measurement in measurements) {
+    for (final field in possiblyNonStringFields) {
+      if (measurement[field] is! String) {
+        measurement[field] = jsonEncode(measurement[field]);
+      }
+    }
+  }
+  return await post(
     Uri.parse('https://cellscan.georgetian.com/api/v1/measurements'),
-    headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8'},
+    headers: {'Content-Type': 'application/json; charset=UTF-8'},
     body: jsonEncode(measurements)
   );
-  if (response.statusCode >= 300) {
-    print('${response.statusCode}: ${response.body}');
-  }
-  return response;
 }
 
 Future<void> uploadAndDeleteMeasurements() async {
