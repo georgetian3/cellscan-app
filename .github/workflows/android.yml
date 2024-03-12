@@ -29,5 +29,3 @@ jobs:
           tag: ${{ env.CELLSCAN_VERSION }}
           commit: main
           artifacts: build/app/outputs/apk/release/cellscan-${{ env.CELLSCAN_VERSION }}.apk
-      - name: Notify new version
-        run: "curl https://cellscan.georgetian.com/api/v1/new
