@@ -5,15 +5,16 @@ import 'package:version/version.dart';
 
 Future<bool> hasUpdate() async {
   try {
-    final response = await get(Uri.parse('https://api.github.com/repos/georgetian3/cellscan-app/releases/latest'));
+    final response = await head(Uri.parse('https://cellscan.georgetian.com/api/v1/apk/latest'));
     if (response.statusCode >= 300) {
       return false;
     }
-    final latestVersion = Version.parse((jsonDecode(response.body)['tag_name'] as String).replaceAll('v', ''));
+    final filename = response.headers['content-disposition'] as String;
+    final latestVersion = Version.parse(RegExp(r'\d+\.\d+\.\d+').firstMatch(filename)![0]!);
     final currentVersion = Version.parse((await PackageInfo.fromPlatform()).version);
     return latestVersion.compareTo(currentVersion) > 0;
   } on Exception catch (e) {
-    print(e.toString());
+    // print(e.toString());
     return false;
   }
 }

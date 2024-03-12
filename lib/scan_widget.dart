@@ -29,29 +29,10 @@ class _ScanWidgetState extends State<ScanWidget> {
   @override
   void initState() {
     super.initState();
-    updateNextScan();
-    updateScanOn();
-    updateUploaded();
-    Scanner().addListener(updateNextScan);
-    Scanner().addListener(updateScanOn);
-    Scanner().addListener(updateUploaded);
+    Scanner().addListener(() => setState(() {}));
+    CellScanDatabase().addListener(() => setState(() {}));
+    Settings().addListener(() => setState(() {}));
   }
-
-  DateTime? _nextScan;
-  void updateNextScan() => setState(() => _nextScan = Scanner().nextScan);
-
-  late bool _scanOn;
-  void updateScanOn() => setState(() => _scanOn = Scanner().scanOn);
-
-  int _uploaded = 0;
-  int _unuploaded = 0;
-
-  void updateUploaded() => CellScanDatabase().count().then((count) =>
-    setState(() {
-      _uploaded = Settings().getUploadCount();
-      _unuploaded = count;
-    })
-  );
 
   @override Widget build(BuildContext context) {
     return ListView(
@@ -61,22 +42,28 @@ class _ScanWidgetState extends State<ScanWidget> {
           leading: const Icon(Icons.cell_tower),
           trailing: Switch(
             onChanged: (scanning) => scanning ? Scanner().start() : Scanner().stop(),
-            value: _scanOn,
+            value: Scanner().scanOn,
           )
         ),
         const Divider(),
         ListTile(
-          title: Text('Next scan'),
-          trailing: Text(_nextScan == null ? '-' : dateToString(_nextScan!))
+          title: Text(translate('gpsSignal')),
+          subtitle: Text(translate('signalHint')),
+          trailing: Icon(Scanner().noGPS ? Icons.close : Icons.done)
         ),
         ListTile(
-          title: Text('Uploaded measurements'),
-          trailing: Text(_uploaded.toString()),
+          title: Text(translate('nextMeasurement')),
+          subtitle: Text('${translate('interval')}: ${Scanner().scanInterval.inSeconds}s'),
+          trailing: Text(Scanner().nextScan == null ? '-' : dateToString(Scanner().nextScan!))
         ),
         ListTile(
-          title: Text('Unuploaded measurements'),
-          subtitle: Text('Connect to the internet to automatically upload'),
-          trailing: Text(_unuploaded.toString()),
+          title: Text(translate('uploadedMeasurements')),
+          trailing: Text(Settings().getUploadCount().toString()),
+        ),
+        ListTile(
+          title: Text(translate('unuploadedMeasurements')),
+          subtitle: Text(translate('connect')),
+          trailing: Text(CellScanDatabase().count.toString()),
         ),
       ],
     );

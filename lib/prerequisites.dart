@@ -1,21 +1,34 @@
 import 'dart:async';
 
-import 'package:cellscan/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:geolocator/geolocator.dart' show Geolocator;
+
 
 class Prerequisite {
-  final String displayName;
+  final String displayNameKey;
   final Future<void> Function() satisfy;
   final Future<bool> Function() checkSatisfied;
   bool isSatisfied = false;
 
   Prerequisite(
-    this.displayName,
+    this.displayNameKey,
     this.satisfy,
     this.checkSatisfied
   );
   
+}
+
+String permissionToKey(Permission permission) {
+  switch (permission) {
+    case Permission.location: return 'prerequisites.location';
+    case Permission.locationAlways: return 'prerequisites.locationAlways';
+    case Permission.phone: return 'prerequisites.phone';
+    case Permission.ignoreBatteryOptimizations: return 'prerequisites.battery';
+    case Permission.notification: return 'prerequisites.notifications';
+    default: return permission.toString();
+  }
 }
 
 class PrerequisiteManager extends ChangeNotifier {
@@ -40,16 +53,18 @@ class PrerequisiteManager extends ChangeNotifier {
     for (final permission in _requiredPermissions) {
       _prerequisites.add(
         Prerequisite(
-          permission.toString(),
+          permissionToKey(permission),
           () async => await permission.request(),
           () async => await permission.status.isGranted
         )
       );
     }
+
+
     _prerequisites.add(
       Prerequisite(
-        'Location service',
-        () async => await Permission.location.serviceStatus == ServiceStatus.enabled,
+        'prerequisites.locationService',
+        () async => await Geolocator.openLocationSettings(),
         () async => await Permission.location.serviceStatus == ServiceStatus.enabled
       )
     );
@@ -63,13 +78,13 @@ class PrerequisiteManager extends ChangeNotifier {
     return _instance;
   }
 
+
   Future<List<Prerequisite>> getPrerequisites() async {
     await updatePrerequisites();
     return _prerequisites;
   }
 
   Future<void> updatePrerequisites() async {
-    print('updating prereqs');
     bool changed = false;
     for (final prerequisite in _prerequisites) {
       bool newValue = await prerequisite.checkSatisfied();
@@ -100,38 +115,49 @@ class PrerequisiteManager extends ChangeNotifier {
     }
     return true;
   }
-
-
 }
 
-class PrerequisitesWidget extends StatelessWidget {
-
+class PrerequisitesWidget extends StatefulWidget {
   const PrerequisitesWidget({super.key});
+  @override createState() => _PrerequisitesWidgetState();
+}
+
+class _PrerequisitesWidgetState extends State<PrerequisitesWidget> {
+
+  @override initState() {
+    super.initState();
+    updatePrerequisites();
+    PrerequisiteManager().addListener(updatePrerequisites);
+  }
+
+  List<Prerequisite> _prerequisites = [];
+  Future<void> updatePrerequisites() async {
+    final tmp = await PrerequisiteManager().getPrerequisites();
+    setState(() => _prerequisites = tmp);
+  }
   
   @override Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        TextButton(onPressed: () async => await PrerequisiteManager().satisfyAllPrerequisites(), child: const Text('Grant permissions')),
+      children: [
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(translate('prerequisites.explanation'), style: Theme.of(context).textTheme.bodyLarge)
+        ),
+        const SizedBox(height: 16),
+        FilledButton(onPressed: () async => await PrerequisiteManager().satisfyAllPrerequisites(), child: Text(translate('prerequisites.grant'))),
+        const SizedBox(height: 16),
         Expanded(
-          child: FutureBuilder(
-            future: PrerequisiteManager().getPrerequisites(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return emptyWidget;
-              }
-              final prerequisites = snapshot.data!;
-              return ListView(
-                children: [
-                  for (final prerequisite in prerequisites) 
-                    ListTile(
-                      title: Text(prerequisite.displayName),
-                      trailing: Icon(prerequisite.isSatisfied ? Icons.done : Icons.close),
-                    )
-                ]
-              );
-            },
-          ),
+          child: ListView(
+            children: [
+              for (final prerequisite in _prerequisites) 
+                ListTile(
+                  title: Text(translate(prerequisite.displayNameKey)),
+                  trailing: Icon(prerequisite.isSatisfied ? Icons.done : Icons.close),
+                )
+            ]
+          )
         )
       ],
     );

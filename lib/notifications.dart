@@ -1,3 +1,4 @@
+import 'package:cellscan/prerequisites.dart';
 import 'package:cellscan/scan.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -8,12 +9,8 @@ class Notifications {
   late final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
 
   final _notificationDetails = const NotificationDetails(android: AndroidNotificationDetails(
-    'cellscan', 'Status',
-    ongoing: true,
-    importance: Importance.low,
-    priority: Priority.low,
+    'cellscan', 'Status', ongoing: true,
   ));
-
 
   Future<void> init() async {
     await _flutterLocalNotificationsPlugin.initialize(
@@ -23,8 +20,20 @@ class Notifications {
 
   Notifications._privateConstructor() {
     _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    Scanner().addListener(() async => await show(Scanner().scanOn ? translate('scanningOn') : translate('scanningOff')));
+    PrerequisiteManager().addListener(() async => await updateNotification());
+    Scanner().addListener(() async => await updateNotification());
   }
+
+  Future<void> updateNotification() async {
+    if (!await PrerequisiteManager().allPrerequisitesSatisfied()) {
+      await show(translate('notifications.grant'));
+    } else if (Scanner().scanOn) {
+      await show(translate('notifications.scanningOn') + (Scanner().noGPS ? ' - ${translate('notifications.noGPS')}' : ''));
+    } else {
+      await show(translate('notifications.scanningOff'));
+    }
+  }
+
   static final Notifications _instance = Notifications._privateConstructor();
   factory Notifications() => _instance;
 
