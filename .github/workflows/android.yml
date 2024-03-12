@@ -21,8 +21,7 @@ jobs:
       - name: Build APK
         run: flutter build apk
       - name: Get app version
-        run: |
-          "echo CELLSCAN_VERSION=v$(cat pubspec.yaml | sed -nr 's/^version: *(.+)/\\1/p') >> $GITHUB_ENV"
+        run: "echo CELLSCAN_VERSION=v$(cat pubspec.yaml | sed -nr 's/^version: *(.+)/\\1/p') >> $GITHUB_ENV"
       - name: Release
         uses: ncipollo/release-action@v1
         with:
