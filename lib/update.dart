@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:http/http.dart';
 import 'package:version/version.dart';
