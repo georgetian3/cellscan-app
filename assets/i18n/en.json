@@ -36,5 +36,6 @@
     },
     "updateAvailable": "New version available",
     "cancel": "Cancel",
-    "update": "Update"
+    "update": "Update",
+    "downloading": "Downloading"
 }

@@ -66,8 +66,6 @@ class Scanner extends ChangeNotifier {
 
   Future<void> scan() async {
 
-    await hasUpdate();
-
     _nextScan = DateTime.now().add(_scanInterval);
     notifyListeners();
 

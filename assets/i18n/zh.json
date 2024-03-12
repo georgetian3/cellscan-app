@@ -35,5 +35,6 @@
     },
     "updateAvailable": "发现新版本",
     "cancel": "取消",
-    "update": "更新"
+    "update": "更新",
+    "downloading": "下载中"
 }
