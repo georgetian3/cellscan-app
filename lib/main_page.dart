@@ -7,7 +7,7 @@ import 'package:cellscan/update.dart';
 import 'package:cellscan/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:ota_update/ota_update.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -16,7 +16,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
 
-  @override void initState() {
+  @override initState() {
     super.initState();
     updatePrerequisites();
     PrerequisiteManager().addListener(updatePrerequisites);
@@ -27,29 +27,60 @@ class _MainPageState extends State<MainPage> {
     bool x = await PrerequisiteManager().allPrerequisitesSatisfied();
     setState(() => allPrerequisitesSatisfied = x);
   }
+  
 
   bool _updateShown = false;
 
-  Future<void> showUpdate(BuildContext context) async {
-    if (_updateShown || !await hasUpdate()) {
+  Future<void> showUpdatePrompt(BuildContext context) async {
+    if (_updateShown || !await Updater().hasUpdate()) {
       return;
     }
     _updateShown = true;
-    showDialog(context: context, builder: (context) => AlertDialog(
+    showDialog(context: context, barrierDismissible: false, builder: (context) => AlertDialog(
         title: Text(translate('updateAvailable')),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: Text(translate('cancel'))),
           TextButton(
-            onPressed: () async => await launchUrl(Uri.parse('https://github.com/georgetian3/cellscan-app/releases/latest')),
-            child: Text(translate('update'))
+            child: Text(translate('update')),
+            onPressed: () async {
+              Navigator.pop(context);
+              if (!await Updater().update()) {
+                return;
+              }
+              showUpdateProgress(context);
+            }
           )
         ],
       )
     );
   }
 
+  void showUpdateProgress(BuildContext context) => showDialog(
+    context: context, barrierDismissible: false, builder: (BuildContext context) => StatefulBuilder(
+      builder: (context, setState) {
+        Updater().addListener(() => setState(() {}));
+        if (Updater().otaEvent != null && Updater().otaEvent!.status != OtaStatus.DOWNLOADING) {
+          Navigator.pop(context);
+        }
+
+        double value = 0;
+        try {
+          value = double.parse(Updater().otaEvent?.value ?? '0') / 100;
+        } on Exception {
+          value = 1;
+        }
+        return SimpleDialog(
+          title: Text(translate('downloading')),
+          contentPadding: const EdgeInsets.all(16),
+          children: [LinearProgressIndicator(value: value)],
+        );
+      }
+    )
+  );
+
+
   @override build(BuildContext context) {
-    showUpdate(context);
+    showUpdatePrompt(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('CellScan'),

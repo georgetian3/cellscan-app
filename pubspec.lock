@@ -97,6 +97,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.10"
+  dio:
+    dependency: transitive
+    description:
+      name: dio
+      sha256: "49af28382aefc53562459104f64d16b9dfd1e8ef68c862d5af436cc8356ce5a8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.4.1"
   dynamic_color:
     dependency: "direct main"
     description:
@@ -365,6 +373,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.11.0"
+  open_filex:
+    dependency: transitive
+    description:
+      name: open_filex
+      sha256: "74e2280754cf8161e860746c3181db2c996d6c1909c7057b738ede4a469816b8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.4.0"
+  ota_update:
+    dependency: "direct main"
+    description:
+      name: ota_update
+      sha256: "8c47531b655f8fcf9961dc7758a933a9ccbcbe1c77a7ec52e5c5cfc2ec367ba7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.0"
   package_info_plus:
     dependency: "direct main"
     description:
@@ -389,6 +413,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.0"
+  path_provider:
+    dependency: transitive
+    description:
+      name: path_provider
+      sha256: b27217933eeeba8ff24845c34003b003b2b22151de3c908d0e679e8fe1aa078b
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.2"
+  path_provider_android:
+    dependency: transitive
+    description:
+      name: path_provider_android
+      sha256: "477184d672607c0a3bf68fbbf601805f92ef79c82b64b4d6eb318cbca4c48668"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.2"
+  path_provider_foundation:
+    dependency: transitive
+    description:
+      name: path_provider_foundation
+      sha256: "5a7999be66e000916500be4f15a3633ebceb8302719b47b9cc49ce924125350f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.2"
   path_provider_linux:
     dependency: transitive
     description:
@@ -674,6 +722,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.2"
+  updater:
+    dependency: "direct main"
+    description:
+      name: updater
+      sha256: "05e57e110cb43281b97f8422f81bdc1ebe283cebdae6f7c4d3d583f8c522ecbf"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.3"
   url_launcher:
     dependency: "direct main"
     description:
