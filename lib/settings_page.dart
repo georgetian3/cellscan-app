@@ -1,4 +1,5 @@
 import 'package:cellscan/locale.dart';
+import 'package:cellscan/scan.dart';
 import 'package:cellscan/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -11,21 +12,12 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  @override
 
   @override void initState() {
     super.initState();
-    updateLanguage();
-    updateTheme();
-    Settings().addListener(updateLanguage);
-    Settings().addListener(updateTheme);
+    Settings().addListener(() => setState(() {}));
+    Scanner().addListener(() => setState(() {}));
   }
-
-  late Language _language;
-  void updateLanguage() => setState(() => _language = Settings().getLanguage());
-
-  late ThemeMode _theme;
-  void updateTheme() => setState(() => _theme = Settings().getTheme());
 
   @override build(BuildContext context) {
     return Scaffold(
@@ -35,9 +27,20 @@ class _SettingsPageState extends State<SettingsPage> {
           context: context,
           tiles: [
             ListTile(
+              title: Text(translate('interval')),
+              leading: const Icon(Icons.timer),
+              subtitle: Slider(
+                min: 10, max: 60, divisions: 5,
+                value: Scanner().scanInterval.inSeconds.toDouble(),
+                label: Scanner().scanInterval.inSeconds.toString(),
+                onChanged: (double value) async => Scanner().setScanInterval(Duration(seconds: value.toInt())),
+              ),
+              trailing: Text('${Scanner().scanInterval.inSeconds.toString()}s')
+            ),
+            ListTile(
               title: Text(translate('settings.language')),
               leading: const Icon(Icons.language),
-              subtitle: Text(_language.toString()),
+              subtitle: Text(Settings().getLanguage().toString()),
               onTap: () => showDialog(
                 context: context,
                 builder: (BuildContext context) => StatefulBuilder(
@@ -66,7 +69,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ListTile(
               title: Text(translate('settings.theme')),
               leading: const Icon(Icons.dark_mode),
-              subtitle: Text(themeToString(_theme)),
+              subtitle: Text(themeToString(Settings().getTheme())),
               onTap: () => showDialog(
                 context: context,
                 builder: (BuildContext context) => StatefulBuilder(
@@ -106,7 +109,7 @@ class _SettingsPageState extends State<SettingsPage> {
               title: Text(translate('settings.information')),
               leading: const Icon(Icons.info),
               onTap: () async => await launchUrl(Uri.parse('https://cellscan.georgetian.com')),
-            ),
+            )
           ]
         ).toList(),
       ),

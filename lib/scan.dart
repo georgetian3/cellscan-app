@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:cellscan/database.dart';
 import 'package:cellscan/measurement.dart';
-import 'package:cellscan/platform.dart';
 import 'package:cellscan/prerequisites.dart';
-import 'package:cellscan/update.dart';
+import 'package:cellscan/settings.dart';
 import 'package:cellscan/upload.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 Map<String, dynamic> measurementToJson(Measurement measurement) {
   if (measurement.location == '') {
@@ -24,6 +25,9 @@ Map<String, dynamic> measurementToJson(Measurement measurement) {
 
 class Scanner extends ChangeNotifier {
 
+  final platform = const MethodChannel('com.georgetian.cellscan/cell_info');
+
+
   Scanner._privateConstructor() {
     start();
   }
@@ -33,9 +37,7 @@ class Scanner extends ChangeNotifier {
 
   Measurement? latestMeasurement;
   Timer? _timer;
-
   bool get noGPS => latestMeasurement != null && !latestMeasurement!.hasLocation();
-
   bool get scanOn => _timer?.isActive ?? false;
 
   DateTime? _nextScan;
@@ -43,15 +45,25 @@ class Scanner extends ChangeNotifier {
 
   bool _isScanning = false;
 
-  final Duration _scanInterval = const Duration(seconds: 10);
+  Duration _scanInterval = Duration(seconds: Settings().getInterval());
   Duration get scanInterval => _scanInterval;
 
-  Future<void> start() async {
+  Future<void> setScanInterval(Duration interval) async {
+    _scanInterval = interval;
+    Settings().setInterval(interval.inSeconds);
+    notifyListeners();
+    // start();
+  }
+
+  void start() {
     if (scanOn) {
-      return;
+      stop();
     }
     scan();
-    _timer = Timer.periodic(_scanInterval, (timer) async => await scan());
+    _timer = Timer.periodic(_scanInterval, (timer) async {
+      _nextScan = DateTime.now().add(_scanInterval);
+      await scan();
+    });
     notifyListeners();
   }
 
@@ -66,10 +78,7 @@ class Scanner extends ChangeNotifier {
 
   Future<void> scan() async {
 
-    _nextScan = DateTime.now().add(_scanInterval);
-    notifyListeners();
-
-    if (!await PrerequisiteManager().allPrerequisitesSatisfied()) {
+    if (_isScanning || !await PrerequisiteManager().allPrerequisitesSatisfied()) {
       return;
     }
 
@@ -77,18 +86,20 @@ class Scanner extends ChangeNotifier {
     notifyListeners();
 
     Measurement measurement = Measurement();
-    measurement.timeMeasured = DateTime.now();
+    measurement.timeMeasured = DateTime.now().toUtc();
     print('Scanning ' + measurement.timeMeasured.toString());
 
     try {
       // first get location, as this usually takes longer
-      measurement.location = await platform.invokeMethod<String>('location').timeout(const Duration(seconds: 5), onTimeout: () => '{}') ?? '{}';
-      measurement.cells = await platform.invokeMethod<String>('cells') ?? '[]';
+      measurement.location = await MethodChannel('com.georgetian.cellscan/cell_info').invokeMethod<String>('location').timeout(const Duration(seconds: 5), onTimeout: () => '{}') ?? '{}';
+      measurement.cells = await MethodChannel('com.georgetian.cellscan/cell_info').invokeMethod<String>('cells') ?? '[]';
     } on Exception catch (e) {
       print('Scan exception: ' + e.toString());
       measurement.location = '{}';
       measurement.cells = '[]';
     }
+
+    print('cells ${measurement.cells.substring(0, min(20, measurement.cells.length))} location ${measurement.location.substring(0, min(20, measurement.location.length))}');
 
     // if (measurement.location.length + measurement.cells.length < 10) { // failed location measurement
     //   return Measurement();
