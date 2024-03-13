@@ -60,7 +60,6 @@ class PrerequisiteManager extends ChangeNotifier {
       );
     }
 
-
     _prerequisites.add(
       Prerequisite(
         'prerequisites.locationService',
@@ -68,7 +67,6 @@ class PrerequisiteManager extends ChangeNotifier {
         () async => await Permission.location.serviceStatus == ServiceStatus.enabled
       )
     );
-
 
   }
 
@@ -133,7 +131,9 @@ class _PrerequisitesWidgetState extends State<PrerequisitesWidget> {
   List<Prerequisite> _prerequisites = [];
   Future<void> updatePrerequisites() async {
     final tmp = await PrerequisiteManager().getPrerequisites();
-    setState(() => _prerequisites = tmp);
+    if (mounted) {
+      setState(() => _prerequisites = tmp);
+    }
   }
   
   @override Widget build(BuildContext context) {

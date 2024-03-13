@@ -1,20 +1,26 @@
+import 'package:cellscan/cellscan.dart';
 import 'package:cellscan/database.dart';
-import 'package:cellscan/locale.dart';
-import 'package:cellscan/main_page.dart';
 import 'package:cellscan/notifications.dart';
 import 'package:cellscan/settings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:dynamic_color/dynamic_color.dart';
 
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  await CellScanDatabase().init();
+  await FlutterBackground.initialize(androidConfig: const FlutterBackgroundAndroidConfig(
+      notificationTitle: "flutter_background example app",
+      notificationText: "Background notification for keeping the example app running in the background",
+      notificationImportance: AndroidNotificationImportance.Default,
+      notificationIcon: AndroidResource(name: 'background_icon', defType: 'drawable'),
+  ));
+  await FlutterBackground.enableBackgroundExecution();
+
   await Settings().init();
   await Notifications().init();
+  await CellScanDatabase().init();
   
   runApp(
     LocalizedApp(
@@ -23,58 +29,4 @@ void main() async {
     )
   );
 
-}
-
-class CellScan extends StatefulWidget {
-  const CellScan({super.key});
-  @override createState() => _CellScanState();
-}
-
-class _CellScanState extends State<CellScan> {
-  @override void initState() {
-    super.initState();
-    Settings().addListener(() => setState(() => {}));
-  }
-
-  static const _brandBlue = Color.fromARGB(255, 135, 206, 250);
-
-  @override
-  Widget build(BuildContext context) {
-    localizationDelegate = LocalizedApp.of(context).delegate;
-    return LocalizationProvider(
-      state: LocalizationProvider.of(context).state,
-      child: DynamicColorBuilder(builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-        ColorScheme lightColorScheme;
-        ColorScheme darkColorScheme;
-        if (lightDynamic != null && darkDynamic != null) {
-          lightColorScheme = lightDynamic.harmonized();
-          lightColorScheme = lightColorScheme.copyWith(secondary: _brandBlue);
-          darkColorScheme = darkDynamic.harmonized();
-          darkColorScheme = darkColorScheme.copyWith(secondary: _brandBlue);
-        } else {
-          lightColorScheme = ColorScheme.fromSeed(seedColor: _brandBlue);
-          darkColorScheme = ColorScheme.fromSeed(seedColor: _brandBlue, brightness: Brightness.dark);
-        }
-      
-        return MaterialApp(
-          title: 'CellScan',
-          localizationsDelegates: [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            localizationDelegate
-          ],
-          supportedLocales: localizationDelegate.supportedLocales,
-          locale: languageToLocale(Settings().getLanguage()),
-          theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
-          darkTheme: ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
-          
-          //   scaffoldBackgroundColor: Colors.black,
-          //   appBarTheme: const AppBarTheme(color: Colors.black),
-          // ),
-          themeMode: Settings().getTheme(),
-          home: const MainPage()
-        );
-      })
-    );
-  }
 }

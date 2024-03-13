@@ -97,14 +97,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.10"
-  dio:
-    dependency: transitive
-    description:
-      name: dio
-      sha256: "49af28382aefc53562459104f64d16b9dfd1e8ef68c862d5af436cc8356ce5a8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.4.1"
   dynamic_color:
     dependency: "direct main"
     description:
@@ -150,14 +142,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_json_view:
+  flutter_background:
     dependency: "direct main"
     description:
-      name: flutter_json_view
-      sha256: b10457bf9cbe24c7ca305f28da238ecd16ebceb66903dab4e67677ee6e45618a
+      name: flutter_background
+      sha256: "035c31a738509d67ee70bbf174e5aa7db462c371e838ec8259700c5c4e7ca17f"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.4"
+    version: "1.2.0"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -373,14 +365,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.11.0"
-  open_filex:
-    dependency: transitive
-    description:
-      name: open_filex
-      sha256: "74e2280754cf8161e860746c3181db2c996d6c1909c7057b738ede4a469816b8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.4.0"
   ota_update:
     dependency: "direct main"
     description:
@@ -413,30 +397,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.0"
-  path_provider:
-    dependency: transitive
-    description:
-      name: path_provider
-      sha256: b27217933eeeba8ff24845c34003b003b2b22151de3c908d0e679e8fe1aa078b
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.2"
-  path_provider_android:
-    dependency: transitive
-    description:
-      name: path_provider_android
-      sha256: "477184d672607c0a3bf68fbbf601805f92ef79c82b64b4d6eb318cbca4c48668"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.2"
-  path_provider_foundation:
-    dependency: transitive
-    description:
-      name: path_provider_foundation
-      sha256: "5a7999be66e000916500be4f15a3633ebceb8302719b47b9cc49ce924125350f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.3.2"
   path_provider_linux:
     dependency: transitive
     description:
@@ -666,22 +626,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.0+1"
-  system_theme:
-    dependency: "direct main"
-    description:
-      name: system_theme
-      sha256: "1f208db140a3d1e1eac2034b54920d95699c1534df576ced44b3312c5de3975f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.3.1"
-  system_theme_web:
-    dependency: transitive
-    description:
-      name: system_theme_web
-      sha256: "7566f5a928f6d28d7a60c97bea8a851d1c6bc9b86a4df2366230a97458489219"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.2"
   term_glyph:
     dependency: transitive
     description:
@@ -722,14 +666,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.2"
-  updater:
-    dependency: "direct main"
-    description:
-      name: updater
-      sha256: "05e57e110cb43281b97f8422f81bdc1ebe283cebdae6f7c4d3d583f8c522ecbf"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.3"
   url_launcher:
     dependency: "direct main"
     description:

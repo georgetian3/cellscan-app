@@ -11,7 +11,6 @@ class Updater extends ChangeNotifier {
   factory Updater() => _instance;
 
   Future<bool> hasUpdate() async {
-    return true;
     try {
       final response = await head(Uri.parse('https://cellscan.georgetian.com/api/v1/apk/latest'));
       if (response.statusCode >= 300) {
@@ -22,7 +21,7 @@ class Updater extends ChangeNotifier {
       final currentVersion = Version.parse((await PackageInfo.fromPlatform()).version);
       return latestVersion.compareTo(currentVersion) > 0;
     } on Exception catch (e) {
-      // print(e.toString());
+      print(e.toString());
       return false;
     }
   }
