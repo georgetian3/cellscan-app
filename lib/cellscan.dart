@@ -1,6 +1,6 @@
 
 
-import 'package:cellscan/locale.dart';
+import 'package:cellscan/localization.dart';
 import 'package:cellscan/main_page.dart';
 import 'package:cellscan/settings.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -23,7 +23,6 @@ class _CellScanState extends State<CellScan> {
 
   @override
   Widget build(BuildContext context) {
-    localizationDelegate = LocalizedApp.of(context).delegate;
     return LocalizationProvider(
       state: LocalizationProvider.of(context).state,
       child: DynamicColorBuilder(builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
@@ -44,10 +43,10 @@ class _CellScanState extends State<CellScan> {
           localizationsDelegates: [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
-            localizationDelegate
+            CellScanLocale().localizationDelegate
           ],
-          supportedLocales: localizationDelegate.supportedLocales,
-          locale: languageToLocale(Settings().getLanguage()),
+          supportedLocales: CellScanLocale().localizationDelegate.supportedLocales,
+          locale: CellScanLocale().languageToLocale(Settings().getLanguage()),
           theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
           darkTheme: ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
           themeMode: Settings().getTheme(),

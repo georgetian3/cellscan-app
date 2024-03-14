@@ -143,6 +143,14 @@ class _PrerequisitesWidgetState extends State<PrerequisitesWidget> {
         const SizedBox(height: 16),
         Padding(
           padding: const EdgeInsets.all(16),
+          child: Text(translate('prerequisites.introduction'), style: Theme.of(context).textTheme.bodyLarge)
+        ),
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(translate('prerequisites.data'), style: Theme.of(context).textTheme.bodyLarge)
+        ),
+        Padding(
+          padding: const EdgeInsets.all(16),
           child: Text(translate('prerequisites.explanation'), style: Theme.of(context).textTheme.bodyLarge)
         ),
         const SizedBox(height: 16),

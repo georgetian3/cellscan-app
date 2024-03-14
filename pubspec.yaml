@@ -2,7 +2,7 @@ name: cellscan
 description: "Collect user and cell tower information for the CellScan project."
 publish_to: 'none'
 
-version: 0.5.4
+version: 0.5.6
 
 environment:
   sdk: '>=3.2.6 <4.0.0'
@@ -10,7 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  cellscan_native:
+    path: cellscan_native
   permission_handler: ^11.3.0
   http: ^1.2.0
   sqflite: ^2.3.2
@@ -26,7 +27,8 @@ dependencies:
   geolocator: ^11.0.0
   dynamic_color: ^1.7.0
   ota_update: ^6.0.0
-  flutter_background: ^1.2.0
+  flutter_background_service: ^5.0.5
+  flutter_background_service_android: ^6.2.2
 
 dev_dependencies:
   flutter_test:

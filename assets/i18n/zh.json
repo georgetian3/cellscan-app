@@ -21,12 +21,14 @@
         "notifications": "通知权限",
         "battery": "后台运行权限",
         "locationService": "定位服务",
-        "explanation": "为了采集数据，请授权/开启以下的权限/服务",
+        "introduction": "CellScan 收集数据用于有关蜂窝塔特性的科学研究。",
+        "data": "仅有设备位置和手机所链接的蜂窝塔信息（不包含个人身份信息）会被采集。",
+        "explanation": "为了有效采集数据，请授权/开启以下的权限/服务。",
         "grant": "授权 / 开启"
     },
     "interval": "测量间隔",
     "gpsSignal": "GPS 信号",
-    "signalHint": "GPS 信号需要直接看到天空",
+    "gpsHint": "为了获取 GPS 信号，请将设备放至可见开阔天空的地方",
     "notifications": {
         "grant": "请授权/开启所有权限/服务",
         "scanningOn": "扫描已开启",
@@ -36,5 +38,7 @@
     "updateAvailable": "发现新版本",
     "cancel": "取消",
     "update": "更新",
-    "downloading": "下载中"
+    "downloading": "下载中",
+    "progress": "数据采集已开启。您可以退出此应用，但请不要拒绝/关闭必要的权限/服务。"
+
 }

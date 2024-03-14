@@ -2,13 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+// import 'package:cellscan/background_service.dart';
 import 'package:cellscan/database.dart';
 import 'package:cellscan/measurement.dart';
 import 'package:cellscan/prerequisites.dart';
-import 'package:cellscan/settings.dart';
+// import 'package:cellscan/settings.dart';
 import 'package:cellscan/upload.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:cellscan_native/cellscan_native.dart';
 
 Map<String, dynamic> measurementToJson(Measurement measurement) {
   if (measurement.location == '') {
@@ -25,59 +26,60 @@ Map<String, dynamic> measurementToJson(Measurement measurement) {
 
 class Scanner extends ChangeNotifier {
 
-  final platform = const MethodChannel('com.georgetian.cellscan/cell_info');
-
-
   Scanner._privateConstructor() {
-    start();
+    // start();
   }
 
   static final Scanner _instance = Scanner._privateConstructor();
   factory Scanner() => _instance;
 
   Measurement? latestMeasurement;
-  Timer? _timer;
   bool get noGPS => latestMeasurement != null && !latestMeasurement!.hasLocation();
-  bool get scanOn => _timer?.isActive ?? false;
 
-  DateTime? _nextScan;
-  DateTime? get nextScan => _nextScan;
+  DateTime? _nextMeasurement;
+  DateTime? get nextMeasurement => _nextMeasurement;
 
   bool _isScanning = false;
 
-  Duration _scanInterval = Duration(seconds: Settings().getInterval());
-  Duration get scanInterval => _scanInterval;
+  static const Duration measurementInterval = Duration(seconds: 10); //Duration(seconds: Settings().getMeasurementInterval());
 
-  Future<void> setScanInterval(Duration interval) async {
-    _scanInterval = interval;
-    Settings().setInterval(interval.inSeconds);
-    notifyListeners();
-    // start();
-  }
+  // Timer? _timer;
 
-  void start() {
-    if (scanOn) {
-      stop();
-    }
-    scan();
-    _timer = Timer.periodic(_scanInterval, (timer) async {
-      _nextScan = DateTime.now().add(_scanInterval);
-      await scan();
-    });
-    notifyListeners();
-  }
+  // Future<void> setScanInterval(Duration interval) async {
+  //   final wasScanning = isRunning;
+  //   if (wasScanning) {
+  //     stop();
+  //   }
+  //   _measurementInterval = interval;
+  //   Settings().setInterval(interval.inSeconds);
+  //   notifyListeners();
+  //   if (wasScanning) {
+  //     start();
+  //   }
+  // }
 
-  void stop() {
-    if (!scanOn) {
-      return;
-    }
-    _timer?.cancel();
-    _nextScan = null;
-    notifyListeners();
-  }
+  // bool _isRunning = false;
+  // bool get isRunning => _isRunning;
+  // Future<void> start() async {
+  //   await BackgroundService().start();
+  //   _isRunning = true;
+  //   _nextMeasurement = DateTime.now().add(measurementInterval);
+  //   _timer = Timer.periodic(measurementInterval, (timer) {
+  //     _nextMeasurement = DateTime.now().add(measurementInterval);
+  //     notifyListeners();
+  //   });
+  //   notifyListeners();
+  // }
+
+  // Future<void> stop() async {
+  //   await BackgroundService().stop();
+  //   _nextMeasurement = null;
+  //   _timer?.cancel();
+  //   _isRunning = false;
+  //   notifyListeners();
+  // }
 
   Future<void> scan() async {
-
     if (_isScanning || !await PrerequisiteManager().allPrerequisitesSatisfied()) {
       return;
     }
@@ -91,8 +93,8 @@ class Scanner extends ChangeNotifier {
 
     try {
       // first get location, as this usually takes longer
-      measurement.location = await MethodChannel('com.georgetian.cellscan/cell_info').invokeMethod<String>('location').timeout(const Duration(seconds: 5), onTimeout: () => '{}') ?? '{}';
-      measurement.cells = await MethodChannel('com.georgetian.cellscan/cell_info').invokeMethod<String>('cells') ?? '[]';
+      measurement.location = await CellscanNative().getLocation().timeout(const Duration(seconds: 5), onTimeout: () => '{}') ?? '{}';
+      measurement.cells = await CellscanNative().getCells() ?? '[]';
     } on Exception catch (e) {
       print('Scan exception: ' + e.toString());
       measurement.location = '{}';

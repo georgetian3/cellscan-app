@@ -1,4 +1,4 @@
-import 'package:cellscan/locale.dart';
+import 'package:cellscan/localization.dart';
 import 'package:cellscan/scan.dart';
 import 'package:cellscan/settings.dart';
 import 'package:flutter/material.dart';
@@ -26,17 +26,17 @@ class _SettingsPageState extends State<SettingsPage> {
         children: ListTile.divideTiles(
           context: context,
           tiles: [
-            ListTile(
-              title: Text(translate('interval')),
-              leading: const Icon(Icons.timer),
-              subtitle: Slider(
-                min: 10, max: 60, divisions: 5,
-                value: Scanner().scanInterval.inSeconds.toDouble(),
-                label: Scanner().scanInterval.inSeconds.toString(),
-                onChanged: (double value) async => Scanner().setScanInterval(Duration(seconds: value.toInt())),
-              ),
-              trailing: Text('${Scanner().scanInterval.inSeconds.toString()}s')
-            ),
+            // ListTile(
+            //   title: Text(translate('interval')),
+            //   leading: const Icon(Icons.timer),
+            //   subtitle: Slider(
+            //     min: 5, max: 30, divisions: 6,
+            //     value: Scanner().measurementInterval.inSeconds.toDouble(),
+            //     label: Scanner().measurementInterval.inSeconds.toString(),
+            //     onChanged: (double value) async => Scanner().setScanInterval(Duration(seconds: value.toInt())),
+            //   ),
+            //   trailing: Text('${Scanner().measurementInterval.inSeconds.toString()}s')
+            // ),
             ListTile(
               title: Text(translate('settings.language')),
               leading: const Icon(Icons.language),
@@ -57,7 +57,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             onChanged: (value) async {
                               await Settings().setLanguage(Language.values[value ?? 0]);
                               setState(() => language = Settings().getLanguage().index);
-                              localizationDelegate.changeLocale(languageToLocale(Settings().getLanguage()));
+                              CellScanLocale().localizationDelegate.changeLocale(CellScanLocale().languageToLocale(Settings().getLanguage()));
                             }
                           )
                       ]
