@@ -41,7 +41,7 @@ class Scanner extends ChangeNotifier {
 
   bool _isScanning = false;
 
-  static const Duration measurementInterval = Duration(seconds: 10); //Duration(seconds: Settings().getMeasurementInterval());
+  static const Duration measurementInterval = Duration(seconds: 30); //Duration(seconds: Settings().getMeasurementInterval());
 
   // Timer? _timer;
 
