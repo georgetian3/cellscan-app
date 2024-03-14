@@ -6,6 +6,7 @@ import 'package:cellscan/scan_widget.dart';
 import 'package:cellscan/settings.dart';
 import 'package:cellscan/update.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:ota_update/ota_update.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -21,6 +22,9 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     updatePrerequisites();
     PrerequisiteManager().addListener(updatePrerequisites);
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      showUpdatePrompt(context);
+    });
   }
 
   bool allPrerequisitesSatisfied = false;
@@ -84,7 +88,6 @@ class _MainPageState extends State<MainPage> {
 
 
   @override build(BuildContext context) {
-    showUpdatePrompt(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('CellScan'),
