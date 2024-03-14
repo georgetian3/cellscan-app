@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:cellscan/background_service.dart';
+// import 'package:cellscan/background_service.dart';
 import 'package:cellscan/database.dart';
 import 'package:cellscan/measurement.dart';
 import 'package:cellscan/prerequisites.dart';
-import 'package:cellscan/settings.dart';
+// import 'package:cellscan/settings.dart';
 import 'package:cellscan/upload.dart';
 import 'package:flutter/material.dart';
 import 'package:cellscan_native/cellscan_native.dart';
@@ -43,7 +43,7 @@ class Scanner extends ChangeNotifier {
 
   static const Duration measurementInterval = Duration(seconds: 10); //Duration(seconds: Settings().getMeasurementInterval());
 
-  Timer? _timer;
+  // Timer? _timer;
 
   // Future<void> setScanInterval(Duration interval) async {
   //   final wasScanning = isRunning;

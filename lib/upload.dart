@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:cellscan/database.dart';
-import 'package:cellscan/settings.dart';
+// import 'package:cellscan/settings.dart';
 import 'package:http/http.dart';
 
 Future<Response> uploadMeasurements(List<Map<String, Object?>> measurements) async {

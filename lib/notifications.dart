@@ -1,9 +1,4 @@
-import 'package:cellscan/prerequisites.dart';
-import 'package:cellscan/scan.dart';
-import 'package:cellscan/settings.dart';
-import 'package:cellscan/utils.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_translate/flutter_translate.dart';
 
 class Notifications {
 
