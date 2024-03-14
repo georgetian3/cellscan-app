@@ -21,12 +21,14 @@
         "notifications": "Notifications",
         "battery": "Run in background",
         "locationService": "Location service",
-        "explanation": "For proper data collection, please grant/enable the following permissions/services",
+        "introduction": "CellScan collects data for the purpose of scientific research concerning the characterization of cellular towers",
+        "data": "Only device location and connected cell tower information, which do not contain personally identifiable information, will be collected.",
+        "explanation": "For effective data collection, please grant/enable the following permissions/services.",
         "grant": "Grant / Enable"
     },
     "interval": "Measurement interval",
     "gpsSignal": "GPS signal",
-    "signalHint": "GPS signal requires a clear view of the sky",
+    "gpsHint": "To find a GPS signal, please place the device somewhere with a clear view of the sky",
     "notifications": {
         "grant": "Please grant / enable all permissions / services",
         "scanningOn": "Scanning on",
@@ -36,5 +38,6 @@
     "updateAvailable": "New version available",
     "cancel": "Cancel",
     "update": "Update",
-    "downloading": "Downloading"
+    "downloading": "Downloading",
+    "progress": "Data collection in progress. You may exit the app, but please do not deny/disable the required permissions/services."
 }

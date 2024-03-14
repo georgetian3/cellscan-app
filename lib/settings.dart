@@ -26,7 +26,6 @@ String themeToString(ThemeMode theme) {
 class Settings extends ChangeNotifier {
 
   Future<void> init() async {
-    SharedPreferences.setPrefix('cellscan');
     _prefs = await SharedPreferences.getInstance();
     notifyListeners();
   }
@@ -40,8 +39,8 @@ class Settings extends ChangeNotifier {
 
   static const _themeKey = 'theme';
   static const _languageKey = 'language';
-  static const _uploadCountKey = 'uploads';
-  static const _intervalKey = 'interval';
+  // static const _uploadCountKey = 'uploads';
+  // static const _intervalKey = 'interval';
 
 
   Language getLanguage() {
@@ -54,18 +53,18 @@ class Settings extends ChangeNotifier {
     return index == null ? ThemeMode.system : ThemeMode.values[index];
   }
 
-  int getInterval() {
-    return _prefs?.getInt(_intervalKey) ?? 10;
-  }
+  // int getMeasurementInterval() {
+  //   return _prefs?.getInt(_intervalKey) ?? 2;
+  // }
 
-  int getUploadCount() {
-    final uploadCount = _prefs?.getInt(_uploadCountKey);
-    return uploadCount ?? 0;
-  }
+  // int getUploadCount() {
+  //   final uploadCount = _prefs?.getInt(_uploadCountKey);
+  //   return uploadCount ?? 0;
+  // }
 
-  Future<void> incrementUploadCount(int increment) async {
-    await _prefs?.setInt(_uploadCountKey, getUploadCount() + increment);
-  }
+  // Future<void> incrementUploadCount(int increment) async {
+  //   await _prefs?.setInt(_uploadCountKey, getUploadCount() + increment);
+  // }
 
 
   Future<void> setLanguage(Language language) async {
@@ -78,11 +77,11 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setInterval(int interval) async {
-    if (interval <= 0) {
-      return;
-    }
-    await _prefs?.setInt(_intervalKey, interval);
-  }
+  // Future<void> setInterval(int interval) async {
+  //   if (interval <= 0) {
+  //     return;
+  //   }
+  //   await _prefs?.setInt(_intervalKey, interval);
+  // }
 
 }

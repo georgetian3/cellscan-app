@@ -1,13 +1,16 @@
 
 
+import 'package:cellscan/localization.dart';
 import 'package:cellscan/prerequisites.dart';
 import 'package:cellscan/scan_widget.dart';
+import 'package:cellscan/settings.dart';
 import 'package:cellscan/settings_page.dart';
 import 'package:cellscan/update.dart';
 import 'package:cellscan/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:ota_update/ota_update.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -86,9 +89,63 @@ class _MainPageState extends State<MainPage> {
         title: const Text('CellScan'),
         actions: [
           IconButton(
-            onPressed: () => navigate(Navigator.push, context, const SettingsPage()),
-            icon: const Icon(Icons.settings)
+            onPressed: () => showDialog(
+              context: context,
+              builder: (BuildContext context) => StatefulBuilder(
+                builder: (context, setState) {
+                  int language = Settings().getLanguage().index;
+                  return SimpleDialog(
+                    title: Text(translate('settings.language')),
+                    children: [
+                      for (var i = 0; i < Language.values.length; i++)
+                        RadioListTile<int>(
+                          title: Text(Language.values[i].toString()),
+                          groupValue: language,
+                          value: i,
+                          onChanged: (value) async {
+                            await Settings().setLanguage(Language.values[value ?? 0]);
+                            setState(() => language = Settings().getLanguage().index);
+                            CellScanLocale().localizationDelegate.changeLocale(CellScanLocale().languageToLocale(Settings().getLanguage()));
+                          }
+                        )
+                    ]
+                  );
+                }
+              )
+            ),
+            icon: const Icon(Icons.translate)
           ),
+          IconButton(
+            onPressed: () => showDialog(
+              context: context,
+              builder: (BuildContext context) => StatefulBuilder(
+                builder: (context, setState) {
+                  int theme = Settings().getTheme().index;
+                  return SimpleDialog(
+                    title: Text(translate('settings.theme')),
+                    children: [
+                      for (var i = 0; i < ThemeMode.values.length; i++)
+                        RadioListTile<int>(
+                          title: Text(themeToString(ThemeMode.values[i])),
+                          groupValue: theme,
+                          value: i,
+                          onChanged: (value) async {
+                            await Settings().setTheme(ThemeMode.values[value ?? 0]);
+                            setState(() => theme = Settings().getTheme().index);
+                          }
+                        )
+                    ]
+                  );
+                }
+              )
+            ),
+            icon: const Icon(Icons.dark_mode)
+          ),
+          IconButton(
+            onPressed: () async => await launchUrl(Uri.parse('https://cellscan.georgetian.com')),
+            icon: const Icon(Icons.info)
+          ),
+          
         ]
       ),
       body: allPrerequisitesSatisfied ? const ScanWidget() : const PrerequisitesWidget()

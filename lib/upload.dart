@@ -25,7 +25,7 @@ Future<void> uploadAndDeleteMeasurements() async {
     if ((await uploadMeasurements(measurements)).statusCode < 300) {
       // delete local measurement only if upload successful
       await CellScanDatabase().deleteMeasurements(measurements);
-      await Settings().incrementUploadCount(measurements.length);
+      // await Settings().incrementUploadCount(measurements.length);
     }
   } on Exception {
     print('Upload failed');
