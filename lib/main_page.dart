@@ -33,7 +33,10 @@ class _MainPageState extends State<MainPage> {
   bool _updateShown = false;
 
   Future<void> showUpdatePrompt(BuildContext context) async {
-    if (_updateShown || !await Updater().hasUpdate()) {
+    if (!await Updater().hasUpdate()) {
+      return;
+    }
+    if (_updateShown) {
       return;
     }
     _updateShown = true;
