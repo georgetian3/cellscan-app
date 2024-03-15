@@ -10,6 +10,7 @@ import 'package:cellscan/prerequisites.dart';
 import 'package:cellscan/upload.dart';
 import 'package:flutter/material.dart';
 import 'package:cellscan_native/cellscan_native.dart';
+import 'package:geolocator/geolocator.dart';
 
 Map<String, dynamic> measurementToJson(Measurement measurement) {
   if (measurement.location == '') {
@@ -41,7 +42,7 @@ class Scanner extends ChangeNotifier {
 
   bool _isScanning = false;
 
-  static const Duration measurementInterval = Duration(seconds: 30); //Duration(seconds: Settings().getMeasurementInterval());
+  static const Duration measurementInterval = Duration(seconds: 10); //Duration(seconds: Settings().getMeasurementInterval());
 
   // Timer? _timer;
 
@@ -93,7 +94,18 @@ class Scanner extends ChangeNotifier {
 
     try {
       // first get location, as this usually takes longer
-      measurement.location = await CellscanNative().getLocation().timeout(const Duration(seconds: 5), onTimeout: () => '{}') ?? '{}';
+      // don't use method channel as it requires Android 12
+      // measurement.location = await CellscanNative().getLocation().timeout(const Duration(seconds: 5), onTimeout: () => '{}') ?? '{}';
+      try {
+        measurement.location = jsonEncode(
+          (await Geolocator.getCurrentPosition(
+            forceAndroidLocationManager: true,
+            timeLimit: const Duration(seconds: 5)
+          )).toJson()
+        );
+      } on TimeoutException {
+        measurement.location = '{}';
+      }
       measurement.cells = await CellscanNative().getCells() ?? '[]';
     } on Exception catch (e) {
       print('Scan exception: ' + e.toString());

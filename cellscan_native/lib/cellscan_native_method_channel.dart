@@ -10,6 +10,6 @@ class MethodChannelCellscanNative extends CellscanNativePlatform {
   final methodChannel = const MethodChannel('cellscan_native');
 
   @override getCells() async => await methodChannel.invokeMethod<String>('getCells');
-  @override getLocation() async => await methodChannel.invokeMethod<String>('getLocation');
+  @override getLocation() async => 'test'; //await methodChannel.invokeMethod<String>('getLocation');
 
 }
