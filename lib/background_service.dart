@@ -43,7 +43,7 @@ void onStart(ServiceInstance service) async {
   var notificationState = NotificationState.none;
 
   // Notifications
-  Timer.periodic(Scanner.measurementInterval, (timer) async {
+  Timer.periodic(const Duration(seconds: 1), (timer) async {
     String title;
     String body = '';
     var newNotificationState = NotificationState.none;
