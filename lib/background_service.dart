@@ -15,6 +15,13 @@ const channelId = 'CellScan';
 const channelName = 'Status';
 const notificationId = 0;
 
+enum NotificationState {
+  none,
+  scanOn,
+  scanOnNoGps,
+  grantPermissions,
+}
+
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
   DartPluginRegistrant.ensureInitialized();
@@ -33,20 +40,29 @@ void onStart(ServiceInstance service) async {
   await CellScanDatabase().init();
   await CellScanLocale().init();
 
+  var notificationState = NotificationState.none;
+
   // Notifications
   Timer.periodic(const Duration(seconds: 1), (timer) async {
     String title;
     String body = '';
+    var newNotificationState = NotificationState.none;
     if (!await PrerequisiteManager().allPrerequisitesSatisfied()) {
       title = translate('notifications.grant');
+      newNotificationState = NotificationState.grantPermissions;
     } else {
       title = translate('notifications.scanningOn');
-      
+      newNotificationState = NotificationState.scanOn;
       if (Scanner().latestMeasurement != null && !Scanner().latestMeasurement!.hasLocation()) {
         title += ' - ${translate('notifications.noGPS')}';
         body = translate('gpsHint');
+        newNotificationState = NotificationState.scanOnNoGps;
       }
-    }    
+    }
+    if (notificationState == newNotificationState) {
+      return;
+    }
+    notificationState = newNotificationState;
     flutterLocalNotificationsPlugin.show(
       notificationId, title, body, notificationDetails,
     );
